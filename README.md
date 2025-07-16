@@ -1,19 +1,12 @@
 # Cliniko Reports for Power BI
+We're really excited to release our Power BI reporting solution for Cliniko, providing detailed insights into appointments, invoices, practitioners, and business performance.
 
-A comprehensive Power BI reporting solution for Cliniko practice management software, providing detailed insights into appointments, invoices, practitioners, and business performance.
-
-## 🚀 Features
-
-- **Appointment Analytics**: Track appointment volumes, types, and scheduling patterns
-- **Financial Reporting**: Monitor invoicing, revenue, and billing performance
-- **Practitioner Insights**: Analyze practitioner productivity and availability
-- **Business Intelligence**: Comprehensive dashboard for practice management
-- **Time Intelligence**: Year-over-year comparisons and trend analysis
-- **API Integration**: Direct connection to Cliniko's REST API using API Keys
+You can either use these reports 'as is', create your own reports, and even contribute to this project.   We would love to see what reports and enchantments you create.
 
 ## 📊 Available Reports
 
 ### Core Reports
+We have added some base reports for you to use, or you can create your own from the data available. 
 
 - **Appointments Dashboard**: Total appointments, YTD tracking, YoY growth
 - **Financial Overview**: Invoice tracking, revenue analysis, product performance
@@ -21,7 +14,6 @@ A comprehensive Power BI reporting solution for Cliniko practice management soft
 - **Business Metrics**: Overall practice performance and KPIs
 
 ### Data Sources
-
 The data sources are directly driven from the [Cliniko API](https://docs.api.cliniko.com/), and includes objects such as:
 
 - Business
@@ -30,6 +22,8 @@ The data sources are directly driven from the [Cliniko API](https://docs.api.cli
 - Appointment Types
 - Invoice and Invoice Items 
 - Products and Services
+
+If your reports don't need these you can remove them to save load time.  You can also add new queries if you want something which we haven't added. 
 
 ## 🛠️ Installation
 
@@ -50,7 +44,7 @@ The data sources are directly driven from the [Cliniko API](https://docs.api.cli
    ```
 
    **Option B: Download ZIP File**
-   - Go to the [GitHub repository](https://github.com/tunechr/cliniko-reports)
+   - Go to the [GitHub repository](https://github.com/CalicoTechnology/cliniko-powerbi)
    - Click the green "Code" button
    - Select "Download ZIP" from the dropdown menu
    - Extract the ZIP file to your desired location on your computer
@@ -63,10 +57,9 @@ The data sources are directly driven from the [Cliniko API](https://docs.api.cli
 3. **Configure Parameters**
 
   The report uses several parameters that need to be configured:
-
-    - APIKey: Your Cliniko API key
-    - API_BASE: Your Cliniko subdomain (e.g., https://api.{shard}.cliniko.com/v1)
-    - TimezoneParameter: Your local timezone for date/time calculations
+   - **APIKey**: Your Cliniko API key
+   - **API_BASE**: Your Cliniko subdomain (e.g., https://api.{shard}.cliniko.com/v1)
+   - **TimezoneParameter**: Your local timezone for date/time calculations
 
 When you open the report for the first time it will prompt you for your `API Key` and `Base Url`, and `Timezone`.
 
@@ -76,16 +69,12 @@ If you do now know your shard, look at the end of the generated API key where yo
 
 Check the [Cliniko Documentation](https://docs.api.cliniko.com/guides/urls) for more info on Shards and API keys. 
 
-If you need to change these at a later date, you can configure the API connection:
+If you need to change these parameters at a later date, you can configure these via the parameters:
 
 1. In Power BI Desktop, click on **Transform data** in the Home ribbon
 2. Go to **Transform data > Edit Parameters**
-3. Update the following parameters:
-   - **APIKey**: Your Cliniko API key
-   - **API_BASE**: Your Cliniko subdomain (e.g., `https://api.{shard}.cliniko.com/v1`)
-   - **TimezoneParameter**: Your local timezone (e.g., `Australia/Melbourne`)
+3. Update the parameters as needed
 4. Click **OK**
-
 5. **Refresh Data**
    - Click "Refresh" to load your Cliniko data
    - The initial load may take several minutes depending on data volume
@@ -101,13 +90,16 @@ If you need to change these at a later date, you can configure the API connectio
 
 ## 🔐 Security & Privacy
 
-- **API Security**: Store API keys securely and never commit them to version control
-- **Data Privacy**: Ensure compliance with healthcare data regulations in your jurisdiction
-- **Access Control**: Use Power BI's built-in security features to control report access
+### API Security
+The reports use a parameter for the API key, this mean that if you save this report the key will be in clear text in the report file. This may be OK for reports on your desktop, but please be mindful if you want to contribute to this project and remove any keys. 
+### Data Privacy
+A general word on security, the reports so pull through personal information from your patients/clients, so please be aware of this when using or publishing the reports. 
+### Publishing and Access Control
+If you are publishing the reports to something like the Power BI Service, please ensure compliance with healthcare data regulations in your jurisdiction.  This includes setting up access to the reports and the data sources. 
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We would love it if you were to contribute to the project! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -125,9 +117,8 @@ This project is licensed under the GNU Affero General Public License v3.0 - see 
 
 ## 🆘 Support
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/tunechr/cliniko-reports/issues)
-- **Documentation**: Check the [Wiki](https://github.com/tunechr/cliniko-reports/wiki) for detailed guides
-- **Community**: Join discussions in the [Discussions](https://github.com/yourusername/cliniko-reports/discussions) section
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/CalicoTechnology/cliniko-powerbi/issues)
+- **Community**: Join discussions in the [Discussions](https://github.com/CalicoTechnology/cliniko-powerbi/discussions) section
 
 ## 🙏 Acknowledgments
 
