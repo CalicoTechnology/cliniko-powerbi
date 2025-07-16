@@ -1,0 +1,23 @@
+table 'Appointment Calendar'
+	lineageTag: d064b7fd-0d3d-4b7a-a541-ea655ca245e9
+
+	column AppointmentDate
+		formatString: Long Date
+		lineageTag: 205078e8-71d2-4330-8e9d-1250b2ef3dea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Appointments[AppointmentDate]
+
+		variation Variation
+			isDefault
+			relationship: adbf554f-3a43-4d42-9e30-c35850288227
+			defaultHierarchy: LocalDateTable_b9fb41f7-3708-4fcc-9ffe-fcb3794e74d2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Appointment Calendar' = calculated
+		mode: import
+		source = GROUPBY(Appointments,Appointments[AppointmentDate])
+
+	annotation PBI_Id = 27a839dee1e34345910a2a10104f1133
+

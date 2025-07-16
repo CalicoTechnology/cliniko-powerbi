@@ -1,0 +1,139 @@
+table Finance_Products
+	lineageTag: cd8c6f13-86fd-411d-97b8-a688054d17c4
+
+	column 'Product Item ID'
+		lineageTag: 915f6048-0141-48b7-9776-b7e842523773
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Product Item ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Item Code'
+		lineageTag: ede17ce4-8ad6-4bf4-a4ca-b81bdbdd0872
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Item Code]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Supplier Name'
+		lineageTag: ef05fa75-52e8-4b00-8a95-d4b4df21a441
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Product Supplier Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		lineageTag: 5bfdd235-20fe-46d3-af5c-a6c4e1ba2739
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cost Price'
+		lineageTag: ca0e03b0-b958-442a-917c-2fc8d4efeea5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Products[Cost Price]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Stock Level'
+		lineageTag: e4d9c746-1f0e-4ceb-b037-cdb85f9d85e9
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Products[Stock Level]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Price Excluding Tax'
+		lineageTag: 54913256-b465-4e4e-a04a-02c56da73dbb
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Products[Price Excluding Tax]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Created At1'
+		formatString: General Date
+		lineageTag: 92d9b032-cd55-4ce8-b6b8-e9b4c849b634
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Created At1]
+
+		variation Variation
+			isDefault
+			relationship: 131359a2-fe60-40e5-a385-7da0b7a73531
+			defaultHierarchy: LocalDateTable_01f51766-f31b-4936-8d8f-d736d857fcd9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Notes
+		lineageTag: 865fb143-c6dc-4010-bcfc-4cee5f15e911
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Notes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Serial Number'
+		lineageTag: e4b517e0-3d93-4b38-add7-4ec32d79443e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Serial Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Price Including Tax'
+		lineageTag: 11f9ce9a-d91b-405a-977b-5d5d37f8e99d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Products[Price Including Tax]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Archived At'
+		formatString: General Date
+		lineageTag: 923e7e1f-6a5d-4d11-9e81-a09e45ed53ca
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Archived At]
+
+		variation Variation
+			isDefault
+			relationship: ed01560d-eb7a-4f60-af0f-e83a91611ecd
+			defaultHierarchy: LocalDateTable_56d1962c-eca6-41fa-ab87-0cd94de248c1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Updated At'
+		formatString: General Date
+		lineageTag: 945dc594-110d-40ea-9814-6db9f1e94a6f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Products[Updated At]
+
+		variation Variation
+			isDefault
+			relationship: 461195e0-8a88-41c6-a44f-94e2b8b46f83
+			defaultHierarchy: LocalDateTable_c887ef54-0070-46fd-81c9-b596b2e42dba.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Finance_Products = calculated
+		mode: import
+		source = Products
+
+	annotation PBI_Id = bcdacfce8cc14f1485e7ee9e77f8e05d
+

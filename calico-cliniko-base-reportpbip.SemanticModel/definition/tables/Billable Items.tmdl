@@ -1,0 +1,107 @@
+/// Contains billable service and product items from Cliniko including pricing,
+/// item types, and codes for invoicing and financial tracking purposes
+table 'Billable Items'
+	lineageTag: 0add6778-3bcd-4bc3-b963-fa67a39bb2bb
+
+	/// Unique identifier for each billable item
+	/// Text data type containing billable item ID from Cliniko system
+	column 'Billable Item ID'
+		dataType: string
+		lineageTag: c3aae6b7-330c-4203-ba62-e12138259233
+		summarizeBy: none
+		sourceColumn: Billable Item ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Code or SKU for the billable item
+	/// Text data type containing item identification code for billing
+	column 'Item Code'
+		dataType: string
+		lineageTag: ef250eec-2e24-4f7a-9137-d99eb3c82976
+		summarizeBy: none
+		sourceColumn: Item Code
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Type classification of the billable item
+	/// Text data type indicating service, product, or other item category
+	column 'Item Type'
+		dataType: string
+		lineageTag: 0ae3d9b7-c903-401f-9598-6b2c96046eb3
+		summarizeBy: none
+		sourceColumn: Item Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Name or description of the billable item
+	/// Text data type containing item name from Cliniko
+	column Name
+		dataType: string
+		lineageTag: c4548697-86dc-4b81-86c3-2191abc91de2
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Standard price for the billable item
+	/// Numeric data type representing default billing price
+	column Price
+		dataType: double
+		lineageTag: 7b6e9c47-d2c3-4ecd-b1eb-38f9ab2f6ccc
+		summarizeBy: sum
+		sourceColumn: Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Date when the billable item was created
+	/// DateTime data type representing item creation date
+	column 'Created At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 133d0896-627b-49ae-bcc9-1580d65893df
+		summarizeBy: none
+		sourceColumn: Created At
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Billable Items' = m
+		mode: import
+		source = ```
+				let
+				BillableItemType = type table [
+				    id = text,
+				    item_code = text,
+				    item_type = text,
+				    name = text,
+				    price = number,
+				    created_at = datetimezone
+				],
+				
+				    QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("billable_items", "billable_items", BillableItemType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, BillableItemType),
+				  
+				  RenamedBillableItemType = Table.RenameColumns(
+				    appliedSchema, 
+				    {
+				        {"id", "Billable Item ID"},
+				        {"item_code", "Item Code"},
+				        {"item_type", "Item Type"},
+				        {"name", "Name"},
+				        {"price", "Price"},
+				        {"created_at", "Created At"}
+				    }
+				)
+				
+				in
+				    RenamedBillableItemType
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

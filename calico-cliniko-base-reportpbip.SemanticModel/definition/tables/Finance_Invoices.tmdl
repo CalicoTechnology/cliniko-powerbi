@@ -1,0 +1,136 @@
+table Finance_Invoices
+	lineageTag: 28268622-ff2c-4b1a-be31-5c4522fb2e7f
+
+	column 'Invoice ID'
+		lineageTag: c32e10b0-be3f-4318-9eec-e854f6a48dcd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[Invoice ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Date'
+		formatString: General Date
+		lineageTag: 58499643-1fec-4dee-b224-4b2eaef25b64
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[Issue Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Amount'
+		lineageTag: 24324321-8106-4321-877a-e752e7df0686
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Invoices[Total Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tax Amount'
+		lineageTag: 0934efef-231b-46a9-ae95-a68859f34058
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Invoices[Tax Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Net Amount'
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 7556d8c8-a04f-44db-af36-f613d5b11962
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Invoices[Net Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Status Code'
+		lineageTag: 068668be-ca80-4d3a-ad03-91745c258fa8
+		summarizeBy: count
+		isNameInferred
+		sourceColumn: Invoices[Status Code]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Discounted Amount'
+		lineageTag: d0d83bd5-dea2-4f97-b613-385176cfdb73
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Invoices[Discounted Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Status Description'
+		lineageTag: 09a89c49-60d8-46c2-ac2c-71c30836d789
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[Status Description]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed Date'
+		formatString: General Date
+		lineageTag: 327038af-5e19-4fde-850f-6fb02a477c5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[Closed Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'practitioner.links.self'
+		lineageTag: c02bbaa4-9fc3-4aa2-8230-de12d50f850d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[practitioner.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'patient.links.self'
+		lineageTag: 6017139e-7b3c-4969-9355-054997d3a1f6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[patient.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'appointment.links.self'
+		lineageTag: 390fca39-cbad-4a54-bdda-ec6d08ef6b1b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[appointment.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'business.links.self'
+		lineageTag: 40f7f6d8-b7d6-4a7d-8fa6-1d5fc212be26
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[business.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column CloseTime
+		lineageTag: d3e155bb-6f36-456a-9afb-2534afdb66be
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Invoices[CloseTime]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Finance_Invoices = calculated
+		mode: import
+		source = Invoices
+
+	annotation PBI_Id = 95e4bac1e6d94620980bfdc4bd77fae1
+

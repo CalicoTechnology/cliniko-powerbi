@@ -1,0 +1,210 @@
+/// Contains appointment type definitions from Cliniko including duration,
+/// booking settings, and payment configurations for different service types
+table AppointmentTypes
+	lineageTag: c2e96e5c-c6af-43eb-a925-98fd82061a8a
+
+	/// Unique identifier for each appointment type
+	/// Text data type containing appointment type ID from Cliniko system
+	column ID
+		dataType: string
+		lineageTag: a9af0ac7-aea7-41e6-9b97-b137c06da0d1
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Category classification for the appointment type
+	/// Text data type used for grouping similar appointment types
+	column Category
+		dataType: string
+		lineageTag: 4aa89ae6-d2b0-4826-bd6c-a55ae57ce5c0
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Color code for visual representation in calendars
+	/// Text data type containing hex color code or color name
+	column Color
+		dataType: string
+		lineageTag: a8836835-53dc-4e3e-978a-7fd833c2969a
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Standard duration for this appointment type in minutes
+	/// Numeric data type representing default appointment length
+	column 'Duration Minutes'
+		dataType: double
+		lineageTag: cc058bbe-fdd2-4740-ab5c-6f1f1648e344
+		summarizeBy: none
+		sourceColumn: Duration Minutes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Name or title of the appointment type
+	/// Text data type containing appointment type name from Cliniko
+	column Name
+		dataType: string
+		lineageTag: ef17357c-7817-42a6-b650-b3d03c8dcacd
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Detailed description of the appointment type
+	/// Text data type containing appointment type description from Cliniko
+	column Description
+		dataType: string
+		lineageTag: bd22e2a3-cff9-4eab-93d1-1db30072481f
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Maximum number of attendees allowed for this appointment type
+	/// Numeric data type representing capacity limit for group appointments
+	column 'Max Attendees'
+		dataType: double
+		lineageTag: 2c786d2b-150e-4dda-a2ae-329922cb7c4a
+		summarizeBy: none
+		sourceColumn: Max Attendees
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether this appointment type is available for online booking
+	/// Boolean data type indicating online booking system availability
+	column 'Show In Online Bookings'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2327de80-2642-49dd-a5a9-d4002896f2dc
+		summarizeBy: none
+		sourceColumn: Show In Online Bookings
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether deposit should be added to patient's credit account
+	/// Boolean data type for deposit handling configuration
+	column 'Add Deposit to Credit Account'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 943bd26f-8d2a-4421-8912-25e34e9e590b
+		summarizeBy: none
+		sourceColumn: Add Deposit to Credit Account
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Required deposit amount for this appointment type
+	/// Numeric data type representing deposit price in currency
+	column 'Deposit Price'
+		dataType: double
+		lineageTag: 7151fb71-7257-4072-894b-185633595e50
+		summarizeBy: none
+		sourceColumn: Deposit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Minimum lead time required for online bookings in hours
+	/// Numeric data type representing advance booking requirement
+	column 'online bookings lead time hours'
+		dataType: double
+		lineageTag: 8c8bb66f-f182-459a-95a6-283e7ca3b286
+		summarizeBy: none
+		sourceColumn: online bookings lead time hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether online payments are enabled for this appointment type
+	/// Boolean data type indicating payment processing capability
+	column 'Online Payments Enabled'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c61cde15-0788-4ab0-82b9-75b62bb24b37
+		summarizeBy: none
+		sourceColumn: Online Payments Enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mode of online payment processing for this appointment type
+	/// Text data type containing payment processing configuration
+	column 'Online Payments Mode'
+		dataType: string
+		lineageTag: dd4d70b1-487e-4b53-84b7-64fa6cffb0bc
+		summarizeBy: none
+		sourceColumn: Online Payments Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether telehealth is enabled for this appointment type
+	/// Boolean data type indicating remote consultation availability
+	column 'Telehealth Enabled'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: fd3107ab-a122-4e79-9b56-b8ddaa731852
+		summarizeBy: none
+		sourceColumn: Telehealth Enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AppointmentTypes = m
+		mode: import
+		source = ```
+				let
+				
+				AppointmentTypeType = type table [
+				    id = text,
+				    category = text,
+				    color = text,
+				    duration_in_minutes = number,
+				    name = text,
+				    description = text,
+				    max_attendees = number,
+				    show_in_online_bookings = logical,
+				    add_deposit_to_account_credit = logical,
+				    deposit_price = number,
+				    online_bookings_lead_time_hours = number,
+				    online_payments_enabled = logical,
+				    online_payments_mode = text,
+				    telehealth_enabled = logical
+				],
+				
+				    QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("appointment_types", "appointment_types",AppointmentTypeType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, AppointmentTypeType),
+				
+				    RenamedTable = Table.RenameColumns(appliedSchema, {
+				        {"id", "ID"},
+				        {"category", "Category"},
+				        {"color", "Color"},
+				        {"duration_in_minutes", "Duration Minutes"},
+				        {"name", "Name"},
+				        {"description", "Description"}, 
+				        {"max_attendees", "Max Attendees"},
+				        {"show_in_online_bookings", "Show In Online Bookings"}, 
+				        {"add_deposit_to_account_credit","Add Deposit to Credit Account"},
+				        {"deposit_price", "Deposit Price"},
+				        {"online_bookings_lead_time_hours", "online bookings lead time hours"},         
+				        {"online_payments_enabled","Online Payments Enabled"},
+				        {"online_payments_mode", "Online Payments Mode"}, 
+				        {"telehealth_enabled", "Telehealth Enabled"}
+				        }        
+				        )
+				in
+				    RenamedTable
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

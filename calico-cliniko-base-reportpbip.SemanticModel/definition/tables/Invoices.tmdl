@@ -1,0 +1,276 @@
+/// Contains invoice data from Cliniko including billing amounts, payment status,
+/// and financial information for revenue tracking and analysis
+table Invoices
+	lineageTag: 6359cd2b-67a7-4d15-80fa-6b4d41fb141a
+
+	/// Sum of all invoice total amounts
+	/// Base measure for financial calculations formatted as currency
+	measure TotalM = Sum([Total Amount])
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 09b98fa5-24b7-42e9-aa41-a58daf4c0f45
+
+	/// Year-to-date total income from invoices
+	/// Cumulative revenue from start of year to selected date
+	measure 'Income YTD' = TOTALYTD( [TotalM] , DateTable[Date] )
+		lineageTag: fc4f4483-d676-46c0-a10a-5307642cdcd1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Year-to-date income for the same period last year
+	/// Enables comparison of current YTD revenue with prior year YTD
+	measure 'Income YTD LY' = TOTALYTD( [TotalM] , SAMEPERIODLASTYEAR('DateTable'[Date] ) )
+		lineageTag: ed02866c-dfe0-48f0-a79f-9e66bd0e0341
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Patient Value Average - revenue per patient
+	/// Calculates average revenue per patient across all patients
+	measure PVA$ = Sum([Total Amount])/Patients[Count of customer]
+		lineageTag: 715409f9-5b0d-4a32-bb2e-0fe95a08bdcb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Unique identifier for each invoice
+	/// Text data type containing invoice ID from Cliniko system
+	column 'Invoice ID'
+		dataType: string
+		lineageTag: ec8e3b5b-22e6-46f2-bc46-06e94c9e5654
+		summarizeBy: none
+		sourceColumn: Invoice ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the invoice was issued
+	/// DateTime data type representing invoice creation date
+	column 'Issue Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 96dc1253-86b2-474d-9a8f-57e9182240cc
+		summarizeBy: none
+		sourceColumn: Issue Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Total amount of the invoice including tax
+	/// Numeric data type representing full invoice value in currency
+	column 'Total Amount'
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: c5c65835-4130-43a7-a1b2-a266cb2cfd28
+		summarizeBy: sum
+		sourceColumn: Total Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Tax amount applied to the invoice
+	/// Numeric data type representing tax portion of invoice
+	column 'Tax Amount'
+		dataType: double
+		lineageTag: ee006ab8-9fce-488c-a35e-ec2db940d7a2
+		summarizeBy: sum
+		sourceColumn: Tax Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Net amount of invoice before tax
+	/// Numeric data type representing pre-tax invoice value
+	column 'Net Amount'
+		dataType: double
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: ae36a86e-c9dc-4fee-9b27-76808693f61e
+		summarizeBy: sum
+		sourceColumn: Net Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Numeric status code for invoice payment status
+	/// Numeric data type representing invoice state as code
+	column 'Status Code'
+		dataType: double
+		lineageTag: a8125a64-8f97-4672-a73b-f6cd85a76878
+		summarizeBy: count
+		sourceColumn: Status Code
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Total amount of discounts applied to the invoice
+	/// Numeric data type representing discount value in currency
+	column 'Discounted Amount'
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 03246b71-99d3-4411-bfc4-e3930ab97d5f
+		summarizeBy: sum
+		sourceColumn: Discounted Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Human-readable description of invoice payment status
+	/// Text data type containing status description from Cliniko
+	column 'Status Description'
+		dataType: string
+		lineageTag: bde4fb27-c187-4dac-a6b3-d1acbee3713f
+		summarizeBy: none
+		sourceColumn: Status Description
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the invoice was closed or paid
+	/// DateTime data type, null if invoice is still open
+	column 'Closed Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2a9abbcc-6026-471e-b010-9adc98104eee
+		summarizeBy: none
+		sourceColumn: Closed Date
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to practitioner record in Cliniko system
+	/// Text data type containing practitioner URL reference
+	column 'practitioner.links.self'
+		dataType: string
+		lineageTag: 6dff59f0-e36d-4460-86ec-cbf312218a1d
+		summarizeBy: none
+		sourceColumn: practitioner.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to patient record in Cliniko system
+	/// Text data type containing patient URL reference
+	column 'patient.links.self'
+		dataType: string
+		lineageTag: 31b8f222-f0bb-4def-adb1-1488e1af9641
+		summarizeBy: none
+		sourceColumn: patient.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to appointment record in Cliniko system
+	/// Text data type containing appointment URL reference
+	column 'appointment.links.self'
+		dataType: string
+		lineageTag: e5b06b73-2d2f-43d0-afba-f625ebb18125
+		summarizeBy: none
+		sourceColumn: appointment.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to business record in Cliniko system
+	/// Text data type containing business URL reference
+	column 'business.links.self'
+		dataType: string
+		lineageTag: 697b1396-8674-4261-a299-03a43c3718ae
+		summarizeBy: none
+		sourceColumn: business.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Days between invoice issue date and closure date
+	/// Numeric data type calculated using DATEDIFF function
+	column CloseTime = DATEDIFF( Invoices[Issue Date] , Invoices[Closed Date],DAY)
+		dataType: double
+		lineageTag: 55edc143-1222-4a67-b98b-c439031649e5
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Invoices = m
+		mode: import
+		source = ```
+				let
+				   
+				InvoiceType = type table [
+				    id = text,
+				    issue_date = date,
+				    total_amount = number,
+				    tax_amount = number,
+				    net_amount = number,
+				    status = number,
+				    discounted_amount = number,
+				    status_description = text,
+				    closed_at = datetime,
+				    practitioner = record,
+				    patient = record,
+				    appointment = record,
+				    business = record,
+				    invoice_items = record
+				],
+				
+				    QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("invoices", "invoices",InvoiceType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, InvoiceType),
+				
+				     // Use the function for practitioner links
+				    TransformedPractitioner = ExpandAndTransform(
+				        appliedSchema, 
+				        "practitioner", 
+				        {"links", "self"}, 
+				        {"practitioner.links", "practitioner.links.self"}
+				    ),
+				    // Use the function for patient links
+				    TransformedPatient = ExpandAndTransform(
+				        TransformedPractitioner, 
+				        "patient", 
+				        {"links", "self"}, 
+				        {"patient.links", "patient.links.self"}
+				    ),
+				
+				    TransformedBusiness = ExpandAndTransform(
+				        TransformedPatient, 
+				        "business", 
+				        {"links", "self"}, 
+				        {"business.links", "business.links.self"}
+				    ),
+				
+				   TransformedAppointment = ExpandAndTransform(
+				        TransformedBusiness, 
+				        "appointment", 
+				        {"links", "self"}, 
+				        {"appointment.links", "appointment.links.self"}
+				    ),
+				  
+				  RenamedInvoiceType = Table.RenameColumns(
+				    TransformedAppointment, 
+				    {
+				        {"id", "Invoice ID"},
+				        {"issue_date", "Issue Date"},
+				        {"total_amount", "Total Amount"},
+				        {"tax_amount", "Tax Amount"},
+				        {"net_amount", "Net Amount"},
+				        {"status", "Status Code"},
+				        {"discounted_amount", "Discounted Amount"},
+				        {"status_description", "Status Description"},
+				        {"closed_at", "Closed Date"}
+				        //{"practitioner.links", "Practitioner Record"}
+				        //{"patient", "Patient Record"},
+				        //{"appointment", "Appointment Record"},
+				       // {"business", "Business Record"},
+				       // {"invoice_items", "Invoice Items Record"}
+				    }
+				)
+				
+				
+				in
+				    RenamedInvoiceType
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

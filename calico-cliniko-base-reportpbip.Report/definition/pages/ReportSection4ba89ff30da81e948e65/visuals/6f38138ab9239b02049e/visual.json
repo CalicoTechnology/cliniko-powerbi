@@ -1,0 +1,449 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "6f38138ab9239b02049e",
+  "position": {
+    "x": 0,
+    "y": 194.18719211822659,
+    "z": 0,
+    "height": 251.82266009852216,
+    "width": 1280.3940886699509,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Practitioners"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Practitioners.Full Name",
+              "nativeQueryRef": "Practitioner",
+              "displayName": "Practitioner"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "ID"
+                    }
+                  },
+                  "Function": 5
+                }
+              },
+              "queryRef": "Appointments.ID",
+              "nativeQueryRef": "Appointments",
+              "displayName": "Appointments"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "CompletedAppointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.CompletedAppointment)",
+              "nativeQueryRef": "Completed Appts",
+              "displayName": "Completed Appts"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "Hours"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.Hours)",
+              "nativeQueryRef": "Total Hours",
+              "displayName": "Total Hours"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Invoices"
+                        }
+                      },
+                      "Property": "Total Amount"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Invoices.Total Amount)",
+              "nativeQueryRef": "Total Revenue",
+              "displayName": "Total Revenue"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Invoices"
+                        }
+                      },
+                      "Property": "Discounted Amount"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Invoices.Discounted Amount)",
+              "nativeQueryRef": "Discount",
+              "displayName": "Discount"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Invoices"
+                        }
+                      },
+                      "Property": "Total Amount"
+                    }
+                  },
+                  "Function": 1
+                }
+              },
+              "queryRef": "Avg(Invoices.Total Amount)",
+              "nativeQueryRef": "Ave Revenue",
+              "displayName": "Ave Revenue"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "Did Not Arrive Count"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.Did Not Arrive Count)",
+              "nativeQueryRef": "DNA",
+              "displayName": "DNA"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "Cancelled At"
+                    }
+                  },
+                  "Function": 5
+                }
+              },
+              "queryRef": "Appointments.Cancelled At",
+              "nativeQueryRef": "Count of Cancelled At",
+              "displayName": "Cancelled"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "CancelledSameDayCount"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.CancelledSameDayCount)",
+              "nativeQueryRef": "Cancelled Same Day",
+              "displayName": "Cancelled Same Day"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Cancellation Percentage"
+                }
+              },
+              "queryRef": "Appointments.Measure",
+              "nativeQueryRef": "Cancellation %",
+              "displayName": "Cancellation %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Future Practitioner Appointments"
+                }
+              },
+              "queryRef": "Appointments.Future Practitioner Appointments",
+              "nativeQueryRef": "Future Pract Appts.",
+              "displayName": "Future Pract Appts."
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "MPVA2"
+                }
+              },
+              "queryRef": "Appointments.MPVA2",
+              "nativeQueryRef": "PVA",
+              "displayName": "PVA"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "First Appointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.First Appointment)",
+              "nativeQueryRef": "First Appts.",
+              "displayName": "First Appts."
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Practitioners"
+                  }
+                },
+                "Property": "Full Name"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "99.06822783283825D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Appointments.Measure"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73.27719459064743D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Appointments.Cancelled At"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "58.19770877468116D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Appointments.MPVA2"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "135.87353099718433D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Practitioners.Full Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "101.43382465317922D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Appointments.ID"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117.32812866678447D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Appointments.CompletedAppointment)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "65.6059119004497D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Avg(Invoices.Total Amount)"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#cccccc'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylePreset": [
+        {
+          "properties": {
+            "name": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Default'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "3be943615bc1c17d803d",
+  "position": {
+    "x": 0,
+    "y": 193.20754716981133,
+    "z": 3000,
+    "height": 526.4905660377359,
+    "width": 1280,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Title"
+                }
+              },
+              "queryRef": "Users.Title",
+              "nativeQueryRef": "Title"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "First Name"
+                }
+              },
+              "queryRef": "Users.First Name",
+              "nativeQueryRef": "First Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Last Name"
+                }
+              },
+              "queryRef": "Users.Last Name",
+              "nativeQueryRef": "Last Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Time Zone"
+                }
+              },
+              "queryRef": "Users.Time Zone",
+              "nativeQueryRef": "Time Zone"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Time Zone Identifier"
+                }
+              },
+              "queryRef": "Users.Time Zone Identifier",
+              "nativeQueryRef": "Time Zone Identifier"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "User ID"
+                }
+              },
+              "queryRef": "Users.User ID",
+              "nativeQueryRef": "User ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "User Active"
+                }
+              },
+              "queryRef": "Users.User Active",
+              "nativeQueryRef": "User Active"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Active"
+                }
+              },
+              "queryRef": "Users.Active",
+              "nativeQueryRef": "Active"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Email"
+                }
+              },
+              "queryRef": "Users.Email",
+              "nativeQueryRef": "Email"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Created at"
+                }
+              },
+              "queryRef": "Users.Created at",
+              "nativeQueryRef": "Created at"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Users"
+                    }
+                  },
+                  "Property": "Updated at"
+                }
+              },
+              "queryRef": "Users.Updated at",
+              "nativeQueryRef": "Updated at"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

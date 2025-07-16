@@ -1,0 +1,157 @@
+/// Contains user account information from Cliniko including system access,
+/// contact details, and account status for administrative users
+table Users
+	lineageTag: 9d0e688f-d334-4737-9d76-a4647605aa7c
+
+	/// Unique identifier for each user account
+	/// Text data type containing user ID from Cliniko system
+	column 'User ID'
+		dataType: string
+		lineageTag: a6400436-56d5-4777-aa0d-5210d08bb12d
+		summarizeBy: none
+		sourceColumn: User ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// User's email address for system access
+	/// Text data type containing primary email for login
+	column Email
+		dataType: string
+		lineageTag: 24c78006-39bd-4122-9fa4-6f6e8f56c02d
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	/// User's title (Mr, Ms, Dr, etc.)
+	/// Text data type containing honorific title
+	column Title
+		dataType: string
+		lineageTag: 56ddd422-b9ed-4c4b-8d6b-d6ae32832995
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	/// User's first name
+	/// Text data type containing given name
+	column 'First Name'
+		dataType: string
+		lineageTag: 17efe5c2-3796-4dcd-a846-243d8709b0d7
+		summarizeBy: none
+		sourceColumn: First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// User's last name
+	/// Text data type containing family name
+	column 'Last Name'
+		dataType: string
+		lineageTag: 458549de-8097-4583-ad6b-b5b7c3960911
+		summarizeBy: none
+		sourceColumn: Last Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// User's time zone
+	/// Text data type containing timezone information
+	column 'Time Zone'
+		dataType: string
+		lineageTag: d8f75b73-f89f-4a44-8356-4be0f73f056a
+		summarizeBy: none
+		sourceColumn: Time Zone
+
+		annotation SummarizationSetBy = Automatic
+
+	/// IANA time zone identifier for the user
+	/// Text data type containing standardized timezone identifier
+	column 'Time Zone Identifier'
+		dataType: string
+		lineageTag: 3ea4d980-2894-4f30-ad0d-1893ae0e1109
+		summarizeBy: none
+		sourceColumn: Time Zone Identifier
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the user account was created
+	/// DateTime data type representing account creation date
+	column 'Created at'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2d79b83e-0952-40eb-bba3-9b66267a85a2
+		summarizeBy: none
+		sourceColumn: Created at
+
+		variation Variation
+			isDefault
+			relationship: 23cecd88-66d5-4c3c-b955-297dd57c1352
+			defaultHierarchy: LocalDateTable_3cfaf5a7-7bcd-48fc-809e-df2dfe0d36b1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the user account was last updated
+	/// DateTime data type representing last modification date
+	column 'Updated at'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8aa6d5d2-8679-4994-bce7-8bc056918624
+		summarizeBy: none
+		sourceColumn: Updated at
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether the user account is active for system access
+	/// Boolean data type indicating user account status
+	column 'User Active'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f7c7e4ea-b23c-43b0-8a9c-709baf909cf4
+		summarizeBy: none
+		sourceColumn: User Active
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether the user account is currently active
+	/// Boolean data type indicating current active status
+	column Active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 734195c5-18e5-4f7a-ae58-e6f48bca33d7
+		summarizeBy: none
+		sourceColumn: Active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Users = m
+		mode: import
+		source = ```
+				let
+				UserType = type table [
+				    id = text,
+				    email = text,
+				    title = text,
+				    first_name = text,
+				    last_name = text,
+				    time_zone =  text,
+				    time_zone_identifier = text,
+				    created_at = datetimezone,
+				    updated_at = datetimezone,
+				    user_active = logical,
+				    active = logical
+				],
+				    QueryFilters = {        
+				        "created_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("users", "users", UserType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, UserType),
+				
+				    RenamedTable = Table.RenameColumns(appliedSchema,{{"id", "User ID"}, {"first_name", "First Name"}, {"last_name", "Last Name"}, {"email", "Email"}, {"title", "Title"}, {"time_zone", "Time Zone"}, {"time_zone_identifier", "Time Zone Identifier"}, {"created_at", "Created at"}, {"updated_at", "Updated at"}, {"active", "Active"}, {"user_active", "User Active"}})
+				
+				in
+				    RenamedTable
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

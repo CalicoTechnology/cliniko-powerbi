@@ -1,0 +1,295 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 2.3809523809523809,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 583.57653366812656,
+            "y": 142.48203246810809
+          },
+          "nodeIndex": "Businesses",
+          "nodeLineageTag": "4ebec7e1-b1e7-4629-bc31-df6053c4c562",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 17
+        },
+        {
+          "location": {
+            "x": 1494.4131763837183,
+            "y": 1304.0657622864526
+          },
+          "nodeIndex": "Diagnostics",
+          "nodeLineageTag": "d8d07cfe-c232-475c-9cab-9f5da57c2931",
+          "size": {
+            "height": 194.59486300139835,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 1300.1252912897248,
+            "y": 789.52962493080736
+          },
+          "nodeIndex": "Patients",
+          "nodeLineageTag": "7a54abf0-6b24-4e9f-8589-67d809873395",
+          "size": {
+            "height": 282,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 866.57142857142856,
+            "y": 580
+          },
+          "nodeIndex": "Appointments",
+          "nodeLineageTag": "4c617707-5872-48d4-adf8-87d6c4af52c5",
+          "size": {
+            "height": 396,
+            "width": 234
+          },
+          "zIndex": 21
+        },
+        {
+          "location": {
+            "x": 841.857142857143,
+            "y": 1147
+          },
+          "nodeIndex": "AppointmentTypes",
+          "nodeLineageTag": "c2e96e5c-c6af-43eb-a925-98fd82061a8a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 19.999999999999993
+          },
+          "nodeIndex": "InvoiceItems",
+          "nodeLineageTag": "b3ddae05-263f-4c97-8653-1e468427eb3f",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 14
+        },
+        {
+          "location": {
+            "x": 273.96598680906322,
+            "y": 382.15862502615295
+          },
+          "nodeIndex": "Invoices",
+          "nodeLineageTag": "bbacfbc3-478a-4a2d-957f-63fedf5529bb",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 15
+        },
+        {
+          "location": {
+            "x": 1207.912774704959,
+            "y": 249.34355681918919
+          },
+          "nodeIndex": "Practitioners",
+          "nodeLineageTag": "f39b2dc3-53e6-4ff0-bc52-e24ab3b68b2b",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 112.74905247578847,
+            "y": 1013.9844905449135
+          },
+          "nodeIndex": "DateTable",
+          "nodeLineageTag": "91c7b083-b9aa-400a-a1d4-3502fe4b645e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 19
+        },
+        {
+          "location": {
+            "x": 1202.9529932329986,
+            "y": 1146.1814182772516
+          },
+          "nodeIndex": "Appointment Calendar",
+          "nodeLineageTag": "d064b7fd-0d3d-4b7a-a541-ea655ca245e9",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 13
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 453.47763425508595
+          },
+          "nodeIndex": "Billable Items",
+          "nodeLineageTag": "0add6778-3bcd-4bc3-b963-fa67a39bb2bb",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1774.5484728341712,
+            "y": 0
+          },
+          "nodeIndex": "Products",
+          "nodeLineageTag": "0255326e-0b8b-4443-a8ee-eee896a43a68",
+          "size": {
+            "height": 360.57142857142867,
+            "width": 234
+          },
+          "zIndex": 18
+        },
+        {
+          "location": {
+            "x": 536.28034253124724,
+            "y": 1064.339943374121
+          },
+          "nodeIndex": "Availability Blocks",
+          "nodeLineageTag": "3878ad00-e3ce-4d61-9c51-4c4ba8573ce3",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 1491.2022266366107,
+            "y": 1136.5050652193183
+          },
+          "nodeIndex": "Timezone",
+          "nodeLineageTag": "62c8977e-26d4-4308-bc45-958fbd0fd4ad",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 2048.7508891659963,
+            "y": 886.76886283286944
+          },
+          "nodeIndex": "StockAdjustments",
+          "nodeLineageTag": "9bce751c-9ce7-40de-9e26-df989d0d0b48",
+          "size": {
+            "height": 257.14285714285711,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 2485.8170467852369,
+            "y": 919.10439560439556
+          },
+          "nodeIndex": "Calendar",
+          "nodeLineageTag": "80d829a3-adef-4cf8-9de5-034a924c5013",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 2086.9583889145224,
+            "y": 34.422086868352615
+          },
+          "nodeIndex": "Finance_Invoices",
+          "nodeLineageTag": "28268622-ff2c-4b1a-be31-5c4522fb2e7f",
+          "size": {
+            "height": 401.24700291287394,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 2476.4141023901734,
+            "y": 41.425081140863377
+          },
+          "nodeIndex": "Finance_InvoiceItems",
+          "nodeLineageTag": "8c3148ed-47e3-4d8c-a7da-4f34825b3fa0",
+          "size": {
+            "height": 354.537365078173,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 2930.3110167385148,
+            "y": 135.60651846189188
+          },
+          "nodeIndex": "Finance_Products",
+          "nodeLineageTag": "cd8c6f13-86fd-411d-97b8-a688054d17c4",
+          "size": {
+            "height": 456.26728323213752,
+            "width": 234
+          },
+          "zIndex": 16
+        },
+        {
+          "location": {
+            "x": 2937.8696299253279,
+            "y": 625.44677032967024
+          },
+          "nodeIndex": "Finance_BillableItems",
+          "nodeLineageTag": "f6558f0d-5c05-4f3c-b97e-40fcc31ed360",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 3221.8696299253279,
+            "y": 599.33031264392548
+          },
+          "nodeIndex": "Users",
+          "nodeLineageTag": "9d0e688f-d334-4737-9d76-a4647605aa7c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 20
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 42,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

@@ -1,0 +1,270 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "f89994617d63e56ca663",
+  "position": {
+    "x": 0,
+    "y": 193.59430604982205,
+    "z": 0,
+    "height": 193.59430604982205,
+    "width": 1278.8612099644126,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DateTable"
+                    }
+                  },
+                  "Property": "Week of Year"
+                }
+              },
+              "queryRef": "DateTable.Week of Year",
+              "nativeQueryRef": "Week",
+              "displayName": "Week"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DateTable"
+                    }
+                  },
+                  "Property": "Start of Week"
+                }
+              },
+              "queryRef": "DateTable.Start of Week",
+              "nativeQueryRef": "Start of Week"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Invoices"
+                        }
+                      },
+                      "Property": "Total Amount"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Invoices.Total Amount)",
+              "nativeQueryRef": "Revenue",
+              "displayName": "Revenue"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "ID"
+                    }
+                  },
+                  "Function": 5
+                }
+              },
+              "queryRef": "Appointments.ID",
+              "nativeQueryRef": "Appointments",
+              "displayName": "Appointments"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "CompletedAppointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.CompletedAppointment)",
+              "nativeQueryRef": "Completed Appts.",
+              "displayName": "Completed Appts."
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "First Appointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.First Appointment)",
+              "nativeQueryRef": "First Appts.",
+              "displayName": "First Appts."
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "CompletedAppointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.CompletedAppointment)",
+              "nativeQueryRef": "Completed Appts.",
+              "displayName": "Completed Appts."
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "Cancelled At"
+                    }
+                  },
+                  "Function": 5
+                }
+              },
+              "queryRef": "Appointments.Cancelled At",
+              "nativeQueryRef": "Cancelled",
+              "displayName": "Cancelled"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "CancelledSameDayCount"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.CancelledSameDayCount)",
+              "nativeQueryRef": "Cancelled Same Day",
+              "displayName": "Cancelled Same Day"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Cancellation Percentage"
+                }
+              },
+              "queryRef": "Appointments.Cancellation Percentage",
+              "nativeQueryRef": "Cancellation %",
+              "displayName": "Cancellation %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Invoices"
+                      }
+                    },
+                    "Property": "Total Amount"
+                  }
+                },
+                "Function": 0
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "211.94006000968903D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DateTable.Start of Week"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Invoiced Amount'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

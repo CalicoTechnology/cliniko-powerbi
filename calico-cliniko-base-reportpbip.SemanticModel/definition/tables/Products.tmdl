@@ -1,0 +1,233 @@
+/// Contains product inventory data from Cliniko including pricing, stock levels,
+/// and supplier information for retail and prescription item management
+table Products
+	lineageTag: 0255326e-0b8b-4443-a8ee-eee896a43a68
+
+	/// Current stock level for the selected product
+	/// Returns the current stock quantity for a single product selection
+	measure CurrentStock = ```
+			
+			SELECTEDVALUE( Products[Stock Level] )
+			
+			```
+		lineageTag: c4ce70a0-16fe-4cb8-8736-c0510cb3a680
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Stock level on a specific date accounting for future adjustments
+	/// Calculates historical stock by removing future stock adjustments
+	measure StockOnDate2 = ```
+			
+			VAR baseline = [CurrentStock]
+			VAR futureAdjustments =
+			  CALCULATE(
+			    SUM( StockAdjustments[Quantity] ),
+			    ALL( 'Calendar' ),                                  // ignore the date filter…
+			    Calendar[Date] > MAX( Calendar[Date] )            // …but only for dates *after* the one in context
+			  )
+			RETURN
+			  baseline - futureAdjustments
+			
+			```
+		lineageTag: 75b35b7c-ceac-40d2-b2d7-8cb7e64d32d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Unique identifier for each product item
+	/// Text data type containing product ID from Cliniko system
+	column 'Product Item ID'
+		dataType: string
+		lineageTag: bc11d976-da54-4216-8349-b76f9c020a61
+		summarizeBy: none
+		sourceColumn: Product Item ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Product code or SKU for inventory management
+	/// Text data type containing item identification code
+	column 'Item Code'
+		dataType: string
+		lineageTag: 6fd3896b-d10a-44f6-8e02-ebacdb2560da
+		summarizeBy: none
+		sourceColumn: Item Code
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Name of the product supplier or manufacturer
+	/// Text data type containing supplier information
+	column 'Product Supplier Name'
+		dataType: string
+		lineageTag: 60e10dcb-6e34-4552-9e52-ed05fd678511
+		summarizeBy: none
+		sourceColumn: Product Supplier Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Name or title of the product
+	/// Text data type containing product name from Cliniko
+	column Name
+		dataType: string
+		lineageTag: 6c8cf40c-0a73-456b-9548-22be351b25de
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Cost price of the product for margin calculations
+	/// Numeric data type representing wholesale/purchase price
+	column 'Cost Price'
+		dataType: double
+		lineageTag: c0ca5b3f-2d30-4df7-8774-a94fce32297b
+		summarizeBy: sum
+		sourceColumn: Cost Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Current quantity of product in stock
+	/// Numeric data type representing available inventory level
+	column 'Stock Level'
+		dataType: double
+		lineageTag: c32a5c28-be3e-4607-b87e-fa925edcf71c
+		summarizeBy: sum
+		sourceColumn: Stock Level
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Selling price of the product excluding tax
+	/// Numeric data type representing pre-tax retail price
+	column 'Price Excluding Tax'
+		dataType: double
+		lineageTag: 34cff271-30c3-4fc5-8adb-82c3f463c052
+		summarizeBy: sum
+		sourceColumn: Price Excluding Tax
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Date when the product record was created
+	/// DateTime data type representing product creation date
+	column 'Created At1'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9bd87e47-4298-44e1-9290-c714a6731d5a
+		summarizeBy: none
+		sourceColumn: Created At1
+
+		variation Variation
+			isDefault
+			relationship: 082d4c20-86b8-4731-944a-903ec9719fbb
+			defaultHierarchy: LocalDateTable_cd6bfb80-6f06-4282-97ea-024cd6fefd51.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Notes
+		dataType: string
+		lineageTag: d16d19e5-2061-4aca-b40f-8de36037e739
+		summarizeBy: none
+		sourceColumn: Notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Serial Number'
+		dataType: string
+		lineageTag: 6ebec89d-1ed0-4d40-bab4-0dddf63d6e0b
+		summarizeBy: none
+		sourceColumn: Serial Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Price Including Tax'
+		dataType: double
+		lineageTag: 65623628-3638-4a69-ab8f-1fc1b58693c7
+		summarizeBy: sum
+		sourceColumn: Price Including Tax
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Archived At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a10836a4-a8d1-4fd6-9040-7d403e0a0057
+		summarizeBy: none
+		sourceColumn: Archived At
+
+		variation Variation
+			isDefault
+			relationship: 785c36eb-7bf3-43c7-b758-6d93655bc3a0
+			defaultHierarchy: LocalDateTable_7cba0d68-97a9-474a-a6d5-6aedc748a2c7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Updated At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 70af4361-693a-433f-9f7d-74bf789281ef
+		summarizeBy: none
+		sourceColumn: Updated At
+
+		variation Variation
+			isDefault
+			relationship: f8310fac-0919-4e24-9e56-3f9aa3d49833
+			defaultHierarchy: LocalDateTable_6ccedc93-e66e-4725-a3b8-be94a1fc4f84.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Products = m
+		mode: import
+		source = ```
+				let
+				ProductItemType = type table [
+				    id = text,
+				    item_code = text,
+				    product_supplier_name = text,
+				    name = text,
+				    notes = text,
+				    cost_price = number,
+				    stock_level = number,
+				    serial_number = text,
+				    price_ex_tax = number,
+				    price_including_tax = number,
+				    archived_at = datetimezone,
+				    created_at = datetimezone,
+				    updated_at = datetimezone
+				],
+				 QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("products", "products", ProductItemType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, ProductItemType),
+				
+				  RenamedProductItemType = Table.RenameColumns(
+				    appliedSchema, 
+				    {
+				        {"id", "Product Item ID"},
+				        {"item_code", "Item Code"},
+				        {"product_supplier_name", "Product Supplier Name"},
+				        {"name", "Name"},
+				        {"notes", "Notes"},
+				        {"cost_price", "Cost Price"},
+				        {"serial_number", "Serial Number"},
+				        {"stock_level", "Stock Level"},
+				        {"price_ex_tax", "Price Excluding Tax"},
+				        {"price_including_tax", "Price Including Tax"},
+				        {"archived_at", "Archived At"},
+				        {"created_at", "Created At1"},
+				        {"updated_at", "Updated At"}
+				    }
+				)
+				
+				in
+				    RenamedProductItemType
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,175 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "0a9981706e547e812763",
+  "position": {
+    "x": 293.97129186602871,
+    "y": 338.3732057416268,
+    "z": 1000,
+    "height": 197.51196172248805,
+    "width": 986.02870813397135,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "Issue Date"
+                }
+              },
+              "queryRef": "Invoices.Issue Date",
+              "nativeQueryRef": "Issue Date"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "Closed Date"
+                }
+              },
+              "queryRef": "Invoices.Closed Date",
+              "nativeQueryRef": "Closed Date"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "TotalM"
+                }
+              },
+              "queryRef": "Invoices.TotalM",
+              "nativeQueryRef": "Total",
+              "displayName": "Total"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "Status Description"
+                }
+              },
+              "queryRef": "Invoices.Status Description",
+              "nativeQueryRef": "Status Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Patients"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Patients.Full Name",
+              "nativeQueryRef": "Patient",
+              "displayName": "Patient"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Practitioners"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Practitioners.Full Name",
+              "nativeQueryRef": "Practitioner",
+              "displayName": "Practitioner"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "CloseTime"
+                }
+              },
+              "queryRef": "Invoices.CancellationLeadTime",
+              "nativeQueryRef": "Days to Close",
+              "displayName": "Days to Close"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Invoices"
+                  }
+                },
+                "Property": "TotalM"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "181.06463922841087D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Invoices.Issue Date"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "171.86118383157364D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Invoices.Closed Date"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,661 @@
+expression ChangeType = ```
+		let
+		    // table should be an actual Table.Type, or a List.Type of Records
+		    Table.ChangeType = (table, tableType as type) as nullable table =>
+		        // we only operate on table types
+		        if (not Type.Is(tableType, type table)) then error "type argument should be a table type" else
+		        // if we have a null value, just return it
+		        if (table = null) then table else
+		        let
+		            columnsForType = Type.RecordFields(Type.TableRow(tableType)),
+		            columnsAsTable = Record.ToTable(columnsForType),
+		            schema = Table.ExpandRecordColumn(columnsAsTable, "Value", {"Type"}, {"Type"}),
+		            previousMeta = Value.Metadata(tableType),
+		
+		            // make sure we have a table
+		            parameterType = Value.Type(table),
+		            _table =
+		                if (Type.Is(parameterType, type table)) then table
+		                else if (Type.Is(parameterType, type list)) then
+		                    let
+		                        asTable = Table.FromList(table, Splitter.SplitByNothing(), {"Column1"}),
+		                        firstValueType = Value.Type(Table.FirstValue(asTable, null)),
+		                        result =
+		                            // if the member is a record (as expected), then expand it. 
+		                            if (Type.Is(firstValueType, type record)) then
+		                                Table.ExpandRecordColumn(asTable, "Column1", schema[Name])
+		                            else
+		                                error Error.Record("Error.Parameter", "table argument is a list, but not a list of records", [ ValueType = firstValueType ])
+		                    in
+		                        if (List.IsEmpty(table)) then
+		                            #table({"a"}, {})
+		                        else result
+		                else
+		                    error Error.Record("Error.Parameter", "table argument should be a table or list of records", [ValueType = parameterType]),
+		
+		            reordered = Table.SelectColumns(_table, schema[Name], MissingField.UseNull),
+		
+		            // process primitive values - this will call Table.TransformColumnTypes
+		            map = (t) => if Type.Is(t, type table) or Type.Is(t, type list) or Type.Is(t, type record) or t = type any then null else t,        
+		            mapped = Table.TransformColumns(schema, {"Type", map}),
+		            omitted = Table.SelectRows(mapped, each [Type] <> null),
+		            existingColumns = Table.ColumnNames(reordered),
+		            removeMissing = Table.SelectRows(omitted, each List.Contains(existingColumns, [Name])),
+		            primativeTransforms = Table.ToRows(removeMissing),
+		            changedPrimatives = Table.TransformColumnTypes(reordered, primativeTransforms),
+		        
+		            // Get the list of transforms we'll use for Record types
+		            recordColumns = Table.SelectRows(schema, each Type.Is([Type], type record)),
+		            recordTypeTransformations = Table.AddColumn(recordColumns, "RecordTransformations", each (r) => Record.ChangeType(r, [Type]), type function),
+		            recordChanges = Table.ToRows(Table.SelectColumns(recordTypeTransformations, {"Name", "RecordTransformations"})),
+		
+		            // Get the list of transforms we'll use for List types
+		            listColumns = Table.SelectRows(schema, each Type.Is([Type], type list)),
+		            listTransforms = Table.AddColumn(listColumns, "ListTransformations", each (t) => List.ChangeType(t, [Type]), Function.Type),
+		            listChanges = Table.ToRows(Table.SelectColumns(listTransforms, {"Name", "ListTransformations"})),
+		
+		            // Get the list of transforms we'll use for Table types
+		            tableColumns = Table.SelectRows(schema, each Type.Is([Type], type table)),
+		            tableTransforms = Table.AddColumn(tableColumns, "TableTransformations", each (t) => @Table.ChangeType(t, [Type]), Function.Type),
+		            tableChanges = Table.ToRows(Table.SelectColumns(tableTransforms, {"Name", "TableTransformations"})),
+		
+		            // Perform all of our transformations
+		            allColumnTransforms = recordChanges & listChanges & tableChanges,
+		            changedRecordTypes = if (List.IsEmpty(allColumnTransforms)) then changedPrimatives else Table.TransformColumns(changedPrimatives, allColumnTransforms, null, MissingField.Ignore),
+		
+		            // set final type
+		            withType = Value.ReplaceType(changedRecordTypes, tableType)
+		        in
+		            if (List.IsEmpty(Record.FieldNames(columnsForType))) then table else withType meta previousMeta,
+		
+		    // If given a generic record type (no predefined fields), the original record is returned
+		    Record.ChangeType = (record as record, recordType as type) =>
+		        let
+		            // record field format is [ fieldName = [ Type = type, Optional = logical], ... ]
+		            fields = try Type.RecordFields(recordType) otherwise error "Record.ChangeType: failed to get record fields. Is this a record type?",
+		            fieldNames = Record.FieldNames(fields),
+		            fieldTable = Record.ToTable(fields),
+		            optionalFields = Table.SelectRows(fieldTable, each [Value][Optional])[Name],
+		            requiredFields = List.Difference(fieldNames, optionalFields),
+		            // make sure all required fields exist
+		            withRequired = Record.SelectFields(record, requiredFields, MissingField.UseNull),
+		            // append optional fields
+		            withOptional = withRequired & Record.SelectFields(record, optionalFields, MissingField.Ignore),
+		            // set types
+		            transforms = GetTransformsForType(recordType),
+		            withTypes = Record.TransformFields(withOptional, transforms, MissingField.Ignore),
+		            // order the same as the record type
+		            reorder = Record.ReorderFields(withTypes, fieldNames, MissingField.Ignore)
+		        in
+		            if (List.IsEmpty(fieldNames)) then record else reorder,
+		
+		    List.ChangeType = (list as list, listType as type) =>
+		        if (not Type.Is(listType, type list)) then error "type argument should be a list type" else
+		        let
+		            listItemType = Type.ListItem(listType),
+		            transform = GetTransformByType(listItemType),
+		            modifiedValues = List.Transform(list, transform),
+		            typed = Value.ReplaceType(modifiedValues, listType)
+		        in
+		            typed,
+		
+		    // Returns a table type for the provided schema table
+		    Schema.ToTableType = (schema as table) as type =>
+		        let
+		            toList = List.Transform(schema[Type], (t) => [Type=t, Optional=false]),
+		            toRecord = Record.FromList(toList, schema[Name]),
+		            toType = Type.ForRecord(toRecord, false),
+		            previousMeta = Value.Metadata(schema)
+		        in
+		            type table (toType) meta previousMeta,
+		
+		    // Returns a list of transformations that can be passed to Table.TransformColumns, or Record.TransformFields
+		    // Format: {"Column", (f) => ...) .... ex: {"A", Number.From}
+		    GetTransformsForType = (_type as type) as list =>
+		        let
+		            fieldsOrColumns = if (Type.Is(_type, type record)) then Type.RecordFields(_type)
+		                            else if (Type.Is(_type, type table)) then Type.RecordFields(Type.TableRow(_type))
+		                            else error "GetTransformsForType: record or table type expected",
+		            toTable = Record.ToTable(fieldsOrColumns),
+		            transformColumn = Table.AddColumn(toTable, "Transform", each GetTransformByType([Value][Type]), Function.Type),
+		            transformMap = Table.ToRows(Table.SelectColumns(transformColumn, {"Name", "Transform"}))
+		        in
+		            transformMap,
+		
+		    GetTransformByType = (_type as type) as function =>
+		                if (Type.Is(_type, type number)) then Number.From
+		        else if (Type.Is(_type, type text)) then Text.From
+		        else if (Type.Is(_type, type date)) then Date.From
+		        else if (Type.Is(_type, type datetime)) then DateTime.From
+		        else if (Type.Is(_type, type duration)) then Duration.From
+		        else if (Type.Is(_type, type datetimezone)) then DateTimeZone.From
+		        else if (Type.Is(_type, type logical)) then Logical.From
+		        else if (Type.Is(_type, type time)) then Time.From
+		        else if (Type.Is(_type, type record)) then (t) => if (t <> null) then @Record.ChangeType(t, _type) else t
+		        else if (Type.Is(_type, type table)) then (t) => if (t <> null) then @Table.ChangeType(t, _type) else t
+		        else if (Type.Is(_type, type list)) then (t) => if (t <> null) then @List.ChangeType(t, _type) else t
+		        else (t) => t
+		in
+		    Table.ChangeType
+		```
+	lineageTag: 7a466cf6-5362-4768-9b33-c98d22544b8a
+	queryGroup: Functions\ChangeType2
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+
+expression APIKey = "MS0xxxxx-au1" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3f8a086a-9ffd-4547-8ba7-698f3607996d
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression WaitFor =
+		(producer as function, interval as function, optional count as number) as any =>
+		    let
+		        list = List.Generate(
+		            () => {0, null},
+		            (state) => state{0} <> null and (count = null or state{0} < count),
+		            (state) => if state{1} <> null then {null, state{1}} else {1 + state{0}, Function.InvokeAfter(() => producer(state{0}), interval(state{0}))},
+		            (state) => state{1})
+		    in
+		        List.Last(list)
+	lineageTag: 8ac5e41c-990b-4f74-985f-21e0ca50013d
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression ToNavigationTable = ```
+		(
+		    table as table,
+		    keyColumns as list,
+		    nameColumn as text,
+		    dataColumn as text,
+		    itemKindColumn as text,
+		    itemNameColumn as text,
+		    isLeafColumn as text
+		) as table =>
+		    let
+		        tableType = Value.Type(table),
+		        newTableType = Type.AddTableKey(tableType, keyColumns, true) meta 
+		        [
+		            NavigationTable.NameColumn = nameColumn, 
+		            NavigationTable.DataColumn = dataColumn,
+		            NavigationTable.ItemKindColumn = itemKindColumn, 
+		            Preview.DelayColumn = itemNameColumn, 
+		            NavigationTable.IsLeafColumn = isLeafColumn
+		        ],
+		        navigationTable = Value.ReplaceType(table, newTableType)
+		    in
+		        navigationTable
+		```
+	lineageTag: 02c1d838-28a3-4a60-b792-09012d6e536b
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GenerateByPage = ```
+		(getNextPage as function) as table =>
+		    let        
+		        listOfPages = List.Generate(
+		            () => getNextPage(null),            // get the first page of data
+		            (lastPage) => lastPage <> null,     // stop when the function returns null
+		            (lastPage) => getNextPage(lastPage) // pass the previous page to the next function call
+		        ),
+		        // concatenate the pages together
+		        tableOfPages = Table.FromList(listOfPages, Splitter.SplitByNothing(), {"Column1"}),
+		        firstRow = tableOfPages{0}?
+		    in
+		        // if we didn't get back any pages of data, return an empty table
+		        // otherwise set the table type based on the columns of the first page
+		        if (firstRow = null) then
+		            Table.FromRows({})
+				// check for empty first table
+				else if (Table.IsEmpty(firstRow[Column1])) then
+					firstRow[Column1]
+		        else
+		            Value.ReplaceType(
+		                Table.ExpandTableColumn(tableOfPages, "Column1", Table.ColumnNames(firstRow[Column1])),
+		                Value.Type(firstRow[Column1])
+		            )
+		```
+	lineageTag: 69763eb2-67b5-4db9-9489-e0942f2055d9
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression Base64Encode =
+		(str as binary) =>
+		    let
+		        unescaped = Binary.ToText(str, BinaryEncoding.Base64),
+		        text = Text.Replace(Text.Replace(Text.Replace(unescaped, "+", "-"), "/", "_"), "=", "")
+		    in
+		        text
+	lineageTag: d3a4975f-3d70-47d7-b64e-fe0ec4b2d951
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetAllPagesByNextLink =
+		(url as text, schemaName as text, optional schema as type, optional queryList as list) as table =>
+		        GenerateByPage(
+		            (previous) =>
+		                let
+		                    next = if (previous <> null) then Value.Metadata(previous)[Next] else null,
+		                    urlToUse = if (next <> null) then next else url,
+		                    current = if (previous <> null and next = null) then null else GetPageMultiple(urlToUse, schemaName, schema, queryList),
+		                    link = if (current <> null) then Value.Metadata(current)[Next] else null
+		                in
+		                    current meta [Next = link]
+		        )
+	lineageTag: 1a98d8a2-190f-4328-b346-bae77382f0f2
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPage = ```
+		(url as text, schemaName as text, optional schema as type, optional query as text) as table =>
+		    let
+		        // Use the provided query parameter, or fall back to the hardcoded logic
+		        q = if query <> null then query 
+		            else if url = "appointments" then "cancelled_at:*" 
+		            else null,
+		
+		        body = MakeRequest(url, null, q),
+		        // ...existing code...
+		        nextLink = if (Record.HasFields(body, "links")) then body[links] else {},
+		        nextLink2 = Record.FieldOrDefault(nextLink, "next"),
+		        nextLink3 = 
+		        if nextLink2 <> null and nextLink2 <> "" and Text.PositionOf(nextLink2, "/", Occurrence.Last) > 0 then
+		            Text.End(nextLink2, Text.Length(nextLink2) - Text.PositionOf(nextLink2, "/", Occurrence.Last))
+		        else
+		            null,       
+		
+		        sn = Text.Start(schemaName, Text.PositionOf(schemaName, "/", Occurrence.First)),   
+		             
+		        bodyData = if (Record.HasFields(body, schemaName)) then Record.FieldOrDefault(body, schemaName) else {},
+		        sn2 =
+		            if (Text.PositionOf(schemaName, "/", Occurrence.First)) > 0 then
+		                Record.FieldOrDefault(body, sn)
+		            else
+		                bodyData,
+		        
+		        data =
+		            if (schema = null) then
+		                Table.FromRecords(sn2)
+		            else
+		                let
+		                    asTable = Table.FromList(sn2, Splitter.SplitByNothing(), {"Column1"}),
+		                    fields = Record.FieldNames(Type.RecordFields(Type.TableRow(schema))),
+		                    expanded = Table.ExpandRecordColumn(asTable, "Column1", fields)
+		                in
+		                    expanded
+		    in
+		        data meta [Next = nextLink3]
+		```
+	lineageTag: 379d357a-db9c-4dd7-9556-0e915b07e15a
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression MakeRequest = ```
+		(url as text, optional apikey as text, optional query as text, optional queryList as list) =>
+		    let
+		        accessToken = APIKey,
+		        encodedToken = Binary.ToText(Text.ToBinary(accessToken), 0),
+		
+		        // Handle single query parameter (backward compatibility)
+		        singleQuery = if query = null then [] else [#"q[]" = query],
+		        
+		        // Handle multiple query parameters as list
+		        multipleQueries = if queryList = null then [] else 
+		            List.Transform(
+		                List.Positions(queryList), 
+		                (i) => Record.FromList({queryList{i}}, {"q[]"})
+		            ),
+		        
+		        // Combine all query parameters
+		        allQueries = singleQuery & List.Accumulate(multipleQueries, [], (state, current) => state & current),
+		        
+		        // Add pagination parameter
+		        finalQuery = allQueries & [per_page = "100"],
+		
+		        headers = [
+		            Accept = "application/json",
+		            Authorization = "Basic " & encodedToken,
+		            #"User-Agent" = "dev@calicotechnology.com.au"
+		        ],
+		        
+		        failStatusCodes = {500, 502, 503, 504, 429},
+		        waitForResult = WaitFor(
+		            (iteration) =>
+		                let
+		                    shard = Text.End(accessToken, 3),
+		                    result = Web.Contents(
+		                        API_BASE,
+		                        [
+		                            RelativePath = url,
+		                            Headers = headers,
+		                            Query = finalQuery,
+		                            ManualStatusHandling = failStatusCodes
+		                        ]
+		                    ),
+		                    buffered = Binary.Buffer(result),
+		                    status = Value.Metadata(result)[Response.Status],                    
+		                    actualResult = if List.Contains(failStatusCodes, status) then null else buffered
+		                in
+		                    actualResult,
+		            (iteration) => #duration(0, 0, 0, Number.Power(2, iteration) * 2),
+		            6
+		        ),
+		        request = Json.Document(waitForResult)
+		    in
+		        request
+		```
+	lineageTag: 893673ac-cfe2-402e-9fc8-a070c2d96e3e
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression API_BASE = "https://api.au1.cliniko.com/v1/" meta [IsParameterQuery=true, List={"https://api.au1.cliniko.com/v1/", "https://api.au2.cliniko.com/v1/", "https://api.au3.cliniko.com/v1/", "https://api.au4.cliniko.com/v1/"}, DefaultValue="https://api.au2.cliniko.com/v1/", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5b19990f-c522-4bf2-bea3-ccb99be37f07
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression ChangeType2 = ```
+		let
+		    Source = (thetable as table, tableType as type) => let
+		    // table should be an actual Table.Type, or a List.Type of Records
+		    Table.ChangeType = (table, tableType as type) as nullable table =>
+		        // we only operate on table types
+		        if (not Type.Is(tableType, type table)) then error "type argument should be a table type" else
+		        // if we have a null value, just return it
+		        if (table = null) then table else
+		        let
+		            columnsForType = Type.RecordFields(Type.TableRow(tableType)),
+		            columnsAsTable = Record.ToTable(columnsForType),
+		            schema = Table.ExpandRecordColumn(columnsAsTable, "Value", {"Type"}, {"Type"}),
+		            previousMeta = Value.Metadata(tableType),
+		
+		            // make sure we have a table
+		            parameterType = Value.Type(table),
+		            _table =
+		                if (Type.Is(parameterType, type table)) then table
+		                else if (Type.Is(parameterType, type list)) then
+		                    let
+		                        asTable = Table.FromList(table, Splitter.SplitByNothing(), {"Column1"}),
+		                        firstValueType = Value.Type(Table.FirstValue(asTable, null)),
+		                        result =
+		                            // if the member is a record (as expected), then expand it. 
+		                            if (Type.Is(firstValueType, type record)) then
+		                                Table.ExpandRecordColumn(asTable, "Column1", schema[Name])
+		                            else
+		                                error Error.Record("Error.Parameter", "table argument is a list, but not a list of records", [ ValueType = firstValueType ])
+		                    in
+		                        if (List.IsEmpty(table)) then
+		                            #table({"a"}, {})
+		                        else result
+		                else
+		                    error Error.Record("Error.Parameter", "table argument should be a table or list of records", [ValueType = parameterType]),
+		
+		            reordered = Table.SelectColumns(_table, schema[Name], MissingField.UseNull),
+		
+		            // process primitive values - this will call Table.TransformColumnTypes
+		            map = (t) => if Type.Is(t, type table) or Type.Is(t, type list) or Type.Is(t, type record) or t = type any then null else t,        
+		            mapped = Table.TransformColumns(schema, {"Type", map}),
+		            omitted = Table.SelectRows(mapped, each [Type] <> null),
+		            existingColumns = Table.ColumnNames(reordered),
+		            removeMissing = Table.SelectRows(omitted, each List.Contains(existingColumns, [Name])),
+		            primativeTransforms = Table.ToRows(removeMissing),
+		            changedPrimatives = Table.TransformColumnTypes(reordered, primativeTransforms),
+		        
+		            // Get the list of transforms we'll use for Record types
+		            recordColumns = Table.SelectRows(schema, each Type.Is([Type], type record)),
+		            recordTypeTransformations = Table.AddColumn(recordColumns, "RecordTransformations", each (r) => Record.ChangeType(r, [Type]), type function),
+		            recordChanges = Table.ToRows(Table.SelectColumns(recordTypeTransformations, {"Name", "RecordTransformations"})),
+		
+		            // Get the list of transforms we'll use for List types
+		            listColumns = Table.SelectRows(schema, each Type.Is([Type], type list)),
+		            listTransforms = Table.AddColumn(listColumns, "ListTransformations", each (t) => List.ChangeType(t, [Type]), Function.Type),
+		            listChanges = Table.ToRows(Table.SelectColumns(listTransforms, {"Name", "ListTransformations"})),
+		
+		            // Get the list of transforms we'll use for Table types
+		            tableColumns = Table.SelectRows(schema, each Type.Is([Type], type table)),
+		            tableTransforms = Table.AddColumn(tableColumns, "TableTransformations", each (t) => @Table.ChangeType(t, [Type]), Function.Type),
+		            tableChanges = Table.ToRows(Table.SelectColumns(tableTransforms, {"Name", "TableTransformations"})),
+		
+		            // Perform all of our transformations
+		            allColumnTransforms = recordChanges & listChanges & tableChanges,
+		            changedRecordTypes = if (List.IsEmpty(allColumnTransforms)) then changedPrimatives else Table.TransformColumns(changedPrimatives, allColumnTransforms, null, MissingField.Ignore),
+		
+		            // set final type
+		            withType = Value.ReplaceType(changedRecordTypes, tableType)
+		        in
+		            if (List.IsEmpty(Record.FieldNames(columnsForType))) then table else withType meta previousMeta,
+		
+		    // If given a generic record type (no predefined fields), the original record is returned
+		    Record.ChangeType = (record as record, recordType as type) =>
+		        let
+		            // record field format is [ fieldName = [ Type = type, Optional = logical], ... ]
+		            fields = try Type.RecordFields(recordType) otherwise error "Record.ChangeType: failed to get record fields. Is this a record type?",
+		            fieldNames = Record.FieldNames(fields),
+		            fieldTable = Record.ToTable(fields),
+		            optionalFields = Table.SelectRows(fieldTable, each [Value][Optional])[Name],
+		            requiredFields = List.Difference(fieldNames, optionalFields),
+		            // make sure all required fields exist
+		            withRequired = Record.SelectFields(record, requiredFields, MissingField.UseNull),
+		            // append optional fields
+		            withOptional = withRequired & Record.SelectFields(record, optionalFields, MissingField.Ignore),
+		            // set types
+		            transforms = GetTransformsForType(recordType),
+		            withTypes = Record.TransformFields(withOptional, transforms, MissingField.Ignore),
+		            // order the same as the record type
+		            reorder = Record.ReorderFields(withTypes, fieldNames, MissingField.Ignore)
+		        in
+		            if (List.IsEmpty(fieldNames)) then record else reorder,
+		
+		    List.ChangeType = (list as list, listType as type) =>
+		        if (not Type.Is(listType, type list)) then error "type argument should be a list type" else
+		        let
+		            listItemType = Type.ListItem(listType),
+		            transform = GetTransformByType(listItemType),
+		            modifiedValues = List.Transform(list, transform),
+		            typed = Value.ReplaceType(modifiedValues, listType)
+		        in
+		            typed,
+		
+		    // Returns a table type for the provided schema table
+		    Schema.ToTableType = (schema as table) as type =>
+		        let
+		            toList = List.Transform(schema[Type], (t) => [Type=t, Optional=false]),
+		            toRecord = Record.FromList(toList, schema[Name]),
+		            toType = Type.ForRecord(toRecord, false),
+		            previousMeta = Value.Metadata(schema)
+		        in
+		            type table (toType) meta previousMeta,
+		
+		    // Returns a list of transformations that can be passed to Table.TransformColumns, or Record.TransformFields
+		    // Format: {"Column", (f) => ...) .... ex: {"A", Number.From}
+		    GetTransformsForType = (_type as type) as list =>
+		        let
+		            fieldsOrColumns = if (Type.Is(_type, type record)) then Type.RecordFields(_type)
+		                            else if (Type.Is(_type, type table)) then Type.RecordFields(Type.TableRow(_type))
+		                            else error "GetTransformsForType: record or table type expected",
+		            toTable = Record.ToTable(fieldsOrColumns),
+		            transformColumn = Table.AddColumn(toTable, "Transform", each GetTransformByType([Value][Type]), Function.Type),
+		            transformMap = Table.ToRows(Table.SelectColumns(transformColumn, {"Name", "Transform"}))
+		        in
+		            transformMap,
+		
+		    GetTransformByType = (_type as type) as function =>
+		                if (Type.Is(_type, type number)) then Number.From
+		        else if (Type.Is(_type, type text)) then Text.From
+		        else if (Type.Is(_type, type date)) then Date.From
+		        else if (Type.Is(_type, type datetime)) then DateTime.From
+		        else if (Type.Is(_type, type duration)) then Duration.From
+		        else if (Type.Is(_type, type datetimezone)) then DateTimeZone.From
+		        else if (Type.Is(_type, type logical)) then Logical.From
+		        else if (Type.Is(_type, type time)) then Time.From
+		        else if (Type.Is(_type, type record)) then (t) => if (t <> null) then @Record.ChangeType(t, _type) else t
+		        else if (Type.Is(_type, type table)) then (t) => if (t <> null) then @Table.ChangeType(t, _type) else t
+		        else if (Type.Is(_type, type list)) then (t) => if (t <> null) then @List.ChangeType(t, _type) else t
+		        else (t) => t
+		in
+		    Table.ChangeType(thetable,tableType)
+		in
+		    Source
+		```
+	lineageTag: 353b039f-3012-47e5-8e31-516259ba7960
+	queryGroup: Functions\ChangeType2
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression ExtractAfterLastSlash =
+		let
+		    ExtractAfterLastSlash = (url as text) as text =>
+		        let
+		            splitList = Text.Split(url, "/"),
+		            lastItem = List.Last(splitList)
+		        in
+		            lastItem
+		in
+		    ExtractAfterLastSlash
+	lineageTag: 1ce5eee1-c5be-4a3a-81e0-c51fdd1565d9
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression ExpandAndTransform = ```
+		let
+		    ExpandAndTransform = (table as table, column as text, nestedColumns as list, newNames as list) as table =>
+		    let
+		
+		        // Check if the column exists in the table
+		        ColumnExists = List.Contains(Table.ColumnNames(table), column),
+		
+		        Result = 
+		        if ColumnExists then
+		            let 
+		            // Expand the first record column
+		            Expanded1 = Table.ExpandRecordColumn(table, column, {nestedColumns{0}}, {newNames{0}}),
+		        
+		            // Expand the second record column (nested)
+		            Expanded2 = Table.ExpandRecordColumn(Expanded1, newNames{0}, {nestedColumns{1}}, {newNames{1}}),
+		        
+		            // Apply the transformation to the final expanded column
+		            TransformedColumn = Table.TransformColumns(Expanded2, {{newNames{1}, ExtractAfterLastSlash, type text}})
+		            
+		            in
+		                TransformedColumn
+		        else
+		            table
+		
+		        
+		    in
+		        //TransformedColumn
+		        Result
+		in
+		    ExpandAndTransform
+		```
+	lineageTag: 537f0e7b-5655-4c57-bafb-690d0ce429b7
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression ToLocalTime =
+		(datetimecolumn as nullable datetimezone) =>
+		let
+		     DateTimeRemoveZone2 = DateTimeZone.RemoveZone( datetimecolumn ),
+		     DateTimeAddZone = DateTime.AddZone( DateTimeRemoveZone2, 0 ),
+		     DateTimetoLocal = DateTimeZone.ToLocal( DateTimeAddZone ),
+		     DateTimeRemoveZone = DateTimeZone.RemoveZone( DateTimetoLocal ),
+		     UTC_To_Local = DateTimeRemoveZone
+		in
+		    UTC_To_Local
+	lineageTag: 3fd137a5-e4ab-4fb4-885a-bcb1fece5dbb
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression TimezoneParameter = 12 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 242163e0-45fe-46b4-92ad-0a2368178440
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+
+expression DateLimit = #datetime(2024, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime", IsParameterQueryRequired=true]
+	lineageTag: e75d23a6-4998-468f-8339-28c5be121d01
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = DateTime
+
+expression GetPageMultiple = ```
+		(url as text, schemaName as text, optional schema as type, optional queryList as list) as table =>
+		    let
+		        body = MakeRequest(url, null, null, queryList),
+		        // ...existing code for processing response...
+		        nextLink = if (Record.HasFields(body, "links")) then body[links] else {},
+		        nextLink2 = Record.FieldOrDefault(nextLink, "next"),
+		        nextLink3 = 
+		        if nextLink2 <> null and nextLink2 <> "" and Text.PositionOf(nextLink2, "/", Occurrence.Last) > 0 then
+		            Text.End(nextLink2, Text.Length(nextLink2) - Text.PositionOf(nextLink2, "/", Occurrence.Last))
+		        else
+		            null,       
+		
+		        sn = Text.Start(schemaName, Text.PositionOf(schemaName, "/", Occurrence.First)),   
+		             
+		        bodyData = if (Record.HasFields(body, schemaName)) then Record.FieldOrDefault(body, schemaName) else {},
+		        sn2 =
+		            if (Text.PositionOf(schemaName, "/", Occurrence.First)) > 0 then
+		                Record.FieldOrDefault(body, sn)
+		            else
+		                bodyData,
+		        
+		        data =
+		            if (schema = null) then
+		                Table.FromRecords(sn2)
+		            else
+		                let
+		                    asTable = Table.FromList(sn2, Splitter.SplitByNothing(), {"Column1"}),
+		                    fields = Record.FieldNames(Type.RecordFields(Type.TableRow(schema))),
+		                    expanded = Table.ExpandRecordColumn(asTable, "Column1", fields)
+		                in
+		                    expanded
+		    in
+		        data meta [Next = nextLink3]
+		```
+	lineageTag: 10647ae3-7027-4d09-955f-39ed6a17a6f1
+	queryGroup: Functions
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+

@@ -1,0 +1,205 @@
+/// Contains business location data from Cliniko including address information,
+/// contact details, and configuration settings for multi-location practices
+table Businesses
+	lineageTag: 4ebec7e1-b1e7-4629-bc31-df6053c4c562
+
+	/// Unique identifier for each business location
+	/// Text data type containing business ID from Cliniko system
+	column ID
+		dataType: string
+		lineageTag: 34c1fa0e-02e6-40f2-8bf5-e55283e77bbf
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// First line of business address
+	/// Text data type containing primary address information
+	column 'Address 1'
+		dataType: string
+		lineageTag: 43272f86-0c9f-4e4c-83aa-03a8faa86828
+		summarizeBy: none
+		sourceColumn: Address 1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Second line of business address
+	/// Text data type containing additional address information
+	column 'Address 2'
+		dataType: string
+		lineageTag: 86dd9b3e-d899-4406-a847-eda34f5d50bf
+		summarizeBy: none
+		sourceColumn: Address 2
+
+		annotation SummarizationSetBy = Automatic
+
+	/// City where the business is located
+	/// Text data type containing city name
+	column City
+		dataType: string
+		lineageTag: 774fa78e-2150-4a33-93f4-4db160abeb3e
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	/// State or province where the business is located
+	/// Text data type containing state/province information
+	column State
+		dataType: string
+		lineageTag: e1f72b9c-29b1-48c1-ab56-2c4d81320e1c
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Country where the business is located
+	/// Text data type containing country name
+	column Country
+		dataType: string
+		lineageTag: 02e803f4-b9f7-432d-8e56-adafd7aa63bd
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Postal/ZIP code for the business address
+	/// Text data type containing postcode information
+	column Postcode
+		dataType: string
+		lineageTag: c894632d-52f7-4b1f-86e7-9d119fdf3acb
+		summarizeBy: none
+		sourceColumn: Postcode
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Official name of the business
+	/// Text data type containing business name from Cliniko
+	column 'Business Name'
+		dataType: string
+		lineageTag: 58adbc7e-b6ea-4b10-a56a-866e190b9e91
+		summarizeBy: none
+		sourceColumn: Business Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Website URL for the business
+	/// Text data type containing website address
+	column 'Website Address'
+		dataType: string
+		lineageTag: 4a246149-e006-4231-9f22-1ea6393f3c4a
+		summarizeBy: none
+		sourceColumn: Website Address
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Email address for customer replies
+	/// Text data type containing reply-to email address
+	column 'Email Reply To'
+		dataType: string
+		lineageTag: 34fff7a0-96f8-4423-ab7c-9f114cb23536
+		summarizeBy: none
+		sourceColumn: Email Reply To
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether this business appears in online booking system
+	/// Boolean data type indicating online booking visibility
+	column 'Show in Online Bookings'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: cb758838-8600-4da6-aa4e-e2649befe0e0
+		summarizeBy: none
+		sourceColumn: Show in Online Bookings
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the business record was created
+	/// DateTime data type representing business creation date
+	column 'Created at'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2fed1e11-ad95-4b3b-aec2-2e967fc635f8
+		summarizeBy: none
+		sourceColumn: Created at
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Time zone name for the business location
+	/// Text data type containing timezone description
+	column time_zone
+		dataType: string
+		lineageTag: 679271c9-11b3-4e99-8a4e-690d828c5694
+		summarizeBy: none
+		sourceColumn: time_zone
+
+		annotation SummarizationSetBy = Automatic
+
+	/// IANA time zone identifier for the business location
+	/// Text data type containing standardized timezone identifier
+	column time_zone_identifier
+		dataType: string
+		lineageTag: d78bccfb-fadc-4ea9-83d8-43ee5550978a
+		summarizeBy: none
+		sourceColumn: time_zone_identifier
+
+		annotation SummarizationSetBy = Automatic
+
+	/// UTC offset for the business timezone
+	/// Numeric data type calculated from timezone lookup table
+	column Column = LOOKUPVALUE(Timezone[UTC Difference],Timezone[IANA],Businesses[time_zone_identifier],0)
+		dataType: double
+		formatString: 0.0000
+		lineageTag: ef63dd52-0986-4397-9f90-c78a18f4796d
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Businesses = m
+		mode: import
+		source = ```
+				let
+				  
+				
+				BusinessType = type table [
+				    id = text,
+				    address_1 = text,
+				    address_2 = text,
+				    city = text,
+				    state = text,
+				    country = text,
+				    post_code = text,
+				    business_name = text,
+				    website_address = text,
+				    email_reply_to = text,
+				    show_in_online_bookings = logical,
+				    created_at = datetimezone,
+				    time_zone = text,
+				    time_zone_identifier = text
+				],
+				
+				    QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("businesses", "businesses",BusinessType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, BusinessType),
+				
+				     RenamedTable = Table.RenameColumns(appliedSchema, {
+				        {"id", "ID"}, 
+				        {"address_1", "Address 1"}, {"address_2", "Address 2"},{"city","City"},{"state","State"},{"country","Country"},{"post_code","Postcode"},
+				        {"business_name","Business Name"}, {"website_address", "Website Address"},    
+				        {"email_reply_to","Email Reply To"},  
+				        {"show_in_online_bookings","Show in Online Bookings"},
+				        {"created_at", "Created at"} 
+				        }        
+				        )
+				in
+				    RenamedTable
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

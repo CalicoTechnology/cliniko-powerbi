@@ -1,0 +1,80 @@
+table 'Availability Blocks'
+	lineageTag: 3878ad00-e3ce-4d61-9c51-4c4ba8573ce3
+
+	column 'Unavailability Block ID'
+		dataType: string
+		lineageTag: bd70350a-e55d-48de-93a8-3da23ddfd3a9
+		summarizeBy: none
+		sourceColumn: Unavailability Block ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Starts At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0b975352-6223-4cfc-8754-e3a471d1515d
+		summarizeBy: none
+		sourceColumn: Starts At
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ends At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a86d2eaa-4c5a-44d8-9847-7f57d5b55630
+		summarizeBy: none
+		sourceColumn: Ends At
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'practitioner.links.self'
+		dataType: string
+		lineageTag: bcab9be2-3477-46b6-990a-771dba13fa15
+		summarizeBy: none
+		sourceColumn: practitioner.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Availability Blocks' = m
+		mode: import
+		source = ```
+				let
+				
+				  AvailabilityBlockType = type table [
+				    id = text,
+				    starts_at = datetimezone,
+				    ends_at = datetimezone,
+				    practitioner = record
+				],
+				
+				 QueryFilters = {        
+				        "created_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("availability_blocks", "availability_blocks", AvailabilityBlockType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, AvailabilityBlockType),
+				
+				  TransformedPractitioner = ExpandAndTransform(
+				        appliedSchema, 
+				        "practitioner", 
+				        {"links", "self"}, 
+				        {"practitioner.links", "practitioner.links.self"}
+				    ),
+				
+				  RenamedBillableItemType = Table.RenameColumns(
+				    TransformedPractitioner, 
+				    {
+				        {"id", "Unavailability Block ID"},
+				        {"starts_at", "Starts At"},
+				        {"ends_at", "Ends At"}
+				        
+				    }
+				)
+				
+				in
+				    RenamedBillableItemType
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

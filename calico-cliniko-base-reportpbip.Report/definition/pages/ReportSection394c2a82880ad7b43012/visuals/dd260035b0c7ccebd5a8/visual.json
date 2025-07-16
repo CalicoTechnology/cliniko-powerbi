@@ -1,0 +1,288 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "dd260035b0c7ccebd5a8",
+  "position": {
+    "x": 294.58054936896809,
+    "y": 245.16703786191539,
+    "z": 3000,
+    "height": 475.12991833704535,
+    "width": 985.419450631032,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Starts At Local"
+                }
+              },
+              "queryRef": "Appointments.Starts At Local",
+              "nativeQueryRef": "Starts At",
+              "displayName": "Starts At"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Ends At Local"
+                }
+              },
+              "queryRef": "Appointments.Ends At Local",
+              "nativeQueryRef": "Ends At",
+              "displayName": "Ends At"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "Duration"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.Duration)",
+              "nativeQueryRef": "Duration",
+              "displayName": "Duration"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "CompletedAppointment"
+                }
+              },
+              "queryRef": "Sum(Appointments.CompletedAppointment)",
+              "nativeQueryRef": "Completed Appointments",
+              "displayName": "Completed Appointments"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Patient Arrived"
+                }
+              },
+              "queryRef": "Appointments.Patient Arrived",
+              "nativeQueryRef": "Patient Arrived"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Patients"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Patients.Full Name",
+              "nativeQueryRef": "Patient",
+              "displayName": "Patient"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Practitioners"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Practitioners.Full Name",
+              "nativeQueryRef": "Practitioner",
+              "displayName": "Practitioner"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "TotalM"
+                }
+              },
+              "queryRef": "Invoices.TotalM",
+              "nativeQueryRef": "Revenue",
+              "displayName": "Revenue"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Invoices"
+                    }
+                  },
+                  "Property": "Status Description"
+                }
+              },
+              "queryRef": "Invoices.Status Description",
+              "nativeQueryRef": "Invoice Status",
+              "displayName": "Invoice Status"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Appointments"
+                        }
+                      },
+                      "Property": "First Appointment"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Appointments.First Appointment)",
+              "nativeQueryRef": "First Appointment",
+              "displayName": "First Appointment"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Appointments"
+                  }
+                },
+                "Property": "Starts At Local"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "97.59339514776337D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Appointments.CompletedAppointment)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "168.4108170887295D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Patients.Full Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "141.42123169549203D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Practitioners.Full Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "66.89300672611748D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(Appointments.Duration)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "61.55870335367692D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Appointments.Patient Arrived"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72.49259910702206D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Invoices.Status Description"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,55 @@
+table Timezone
+	lineageTag: 62c8977e-26d4-4308-bc45-958fbd0fd4ad
+
+	column IANA
+		dataType: string
+		lineageTag: 48daf5cb-3789-4c86-873b-19a453c22a90
+		summarizeBy: none
+		sourceColumn: IANA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'UTC Difference'
+		dataType: double
+		lineageTag: 78f6a09c-b956-42c8-b356-b452592f4a6a
+		summarizeBy: sum
+		sourceColumn: UTC Difference
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Timezone = m
+		mode: import
+		source = ```
+				let
+				    TimeZoneTable = #table(
+				        {"IANA", "UTC Difference"},
+				        {
+				          {"UTC", "0:00"},
+				          
+				            {"Australia/ACT", "10:00"},
+				            {"Australia/Sydney", "10:00"},
+				            {"Australia/Adelaide", "9:30"},
+				            {"Australia/Perth", "8:00"},
+				            {"NewZealand/Auckland", "12:00"},
+				            {"Canada/St_Johns", "-3:30"},
+				            {"Canada/Halifax", "-4:00"},
+				            {"Canada/Toronto", "-5:00"},
+				            {"Canada/Winnipeg", "-6:00"},
+				            {"Canada/Edmonton", "-7:00"},
+				            {"Canada/Vancouver", "-8:00"},
+				            {"Europe/London", "0:00"},
+				            {"Pacific/Auckland","10:00"}
+				            
+				        }
+				    ),
+				    #"Changed Type" = Table.TransformColumnTypes(TimeZoneTable,{{"UTC Difference", type duration}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

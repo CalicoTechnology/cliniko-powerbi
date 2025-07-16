@@ -1,0 +1,272 @@
+/// Contains individual line items from invoices including pricing, discounts,
+/// taxes, and product information for detailed financial analysis
+table InvoiceItems
+	lineageTag: c43de49a-2bb4-40cb-b2fb-4a4836de1a45
+
+	/// Unique identifier for each invoice item
+	/// Text data type containing invoice item ID from Cliniko system
+	column 'Invoice Item ID'
+		dataType: string
+		lineageTag: 4a9b3cae-c884-4f6b-884c-5968f97167de
+		summarizeBy: none
+		sourceColumn: Invoice Item ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tax amount applied to this invoice item
+	/// Numeric data type representing tax portion of the line item
+	column 'Tax Amount'
+		dataType: double
+		lineageTag: 0e41d3bf-4ac0-40a8-b733-c448888e0c49
+		summarizeBy: sum
+		sourceColumn: Tax Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Total discount amount applied to this invoice item
+	/// Numeric data type representing discount value in currency
+	column 'Discounted Amount'
+		dataType: double
+		lineageTag: 13ec7765-2804-4538-adea-8a50726f10e2
+		summarizeBy: sum
+		sourceColumn: Discounted Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Name of the concession type applied to this item
+	/// Text data type containing concession category description
+	column 'Concession Type Name'
+		dataType: string
+		lineageTag: 5bbd92c8-2649-490c-9a8b-292079bc716a
+		summarizeBy: none
+		sourceColumn: Concession Type Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Percentage discount applied to this invoice item
+	/// Numeric data type representing discount rate as percentage
+	column 'Discount Percentage'
+		dataType: double
+		lineageTag: b89d3c03-920e-493d-b337-2aa3d9458d59
+		summarizeBy: sum
+		sourceColumn: Discount Percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether the discount is a fixed monetary amount
+	/// Boolean data type indicating discount type (monetary vs percentage)
+	column 'Is Monetary Discount'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f75d19df-6cb5-49f8-b1ca-08a83f70fe9f
+		summarizeBy: none
+		sourceColumn: Is Monetary Discount
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Name or description of the invoice item
+	/// Text data type containing item name from Cliniko
+	column Name
+		dataType: string
+		lineageTag: 652ae896-b049-43b5-953d-90d58fbaca67
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Net price of the item before tax
+	/// Numeric data type representing pre-tax item value
+	column 'Net Price'
+		dataType: double
+		lineageTag: aac45fbd-d767-4bf8-9470-13e82df1d2e2
+		summarizeBy: sum
+		sourceColumn: Net Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Quantity of items on this invoice line
+	/// Numeric data type representing number of units
+	column Quantity
+		dataType: double
+		lineageTag: e94efd72-c58a-442a-883e-4488392dd755
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Name of the tax applied to this item
+	/// Text data type containing tax category description
+	column 'Tax Name'
+		dataType: string
+		lineageTag: 34898fab-2ee5-447c-bd07-8465fd2dfbcc
+		summarizeBy: none
+		sourceColumn: Tax Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tax rate applied to this item
+	/// Text data type containing tax rate information
+	column 'Tax Rate'
+		dataType: string
+		lineageTag: 3f25c2d4-1cb0-4091-9713-fe60522aca16
+		summarizeBy: none
+		sourceColumn: Tax Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Unit price of the item before discounts and tax
+	/// Numeric data type representing price per unit
+	column 'Unit Price'
+		dataType: double
+		lineageTag: 6cbe51e2-fdcc-49aa-b3f7-db8b0dacd32d
+		summarizeBy: sum
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Total amount including tax for this invoice item
+	/// Numeric data type representing final line item value
+	column 'Total Including Tax'
+		dataType: double
+		lineageTag: 46066e4d-1e12-482e-8aba-0d8a9ba07acd
+		summarizeBy: sum
+		sourceColumn: Total Including Tax
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Code or identifier for the invoice item
+	/// Text data type containing item code from Cliniko
+	column Code
+		dataType: string
+		lineageTag: 9516b025-6109-4e59-b3d1-82ad8fe16452
+		summarizeBy: none
+		sourceColumn: Code
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to billable item record in Cliniko system
+	/// Text data type containing billable item URL reference
+	column 'billable_item.links.self'
+		dataType: string
+		lineageTag: 1bb4bcfd-0161-45af-90ec-f710ff03cb03
+		summarizeBy: none
+		sourceColumn: billable_item.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to product record in Cliniko system
+	/// Text data type containing product URL reference
+	column 'product.links.self'
+		dataType: string
+		lineageTag: ae9f1f0c-03d6-4afd-ac85-142f0712a880
+		summarizeBy: none
+		sourceColumn: product.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to parent invoice record in Cliniko system
+	/// Text data type containing invoice URL reference
+	column 'invoice.links.self'
+		dataType: string
+		lineageTag: 81889b5c-0ebb-4509-919b-b083f5c65072
+		summarizeBy: none
+		sourceColumn: invoice.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	partition InvoiceItems = m
+		mode: import
+		source = ```
+				let   
+				 
+				InvoiceItemType = type table [
+				    id = text,
+				    concession_type_name = text,
+				    discount_percentage = number,
+				    discounted_amount = number,
+				    is_monetary_discount = logical,
+				    name = text,
+				    net_price = number,
+				    quantity = number,
+				    tax_amount = number,
+				    tax_name = text,
+				    tax_rate = text,
+				    unit_price = number,
+				    total_including_tax = number,
+				    code = text,
+				    invoice = record,
+				    billable_item = record,
+				    product = record
+				],
+				 QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("invoice_items", "invoice_items",InvoiceItemType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, InvoiceItemType),
+				
+				 TransformedPractitioner = ExpandAndTransform(
+				        appliedSchema, 
+				        "billable_item", 
+				        {"links", "self"}, 
+				        {"billable_item.links", "billable_item.links.self"}
+				    ),
+				
+				     TransformedProduct = ExpandAndTransform(
+				        TransformedPractitioner, 
+				        "product", 
+				        {"links", "self"}, 
+				        {"product.links", "product.links.self"}
+				    ),
+				
+				    TransformedInvoice = ExpandAndTransform(
+				        TransformedProduct, 
+				        "invoice", 
+				        {"links", "self"}, 
+				        {"invoice.links", "invoice.links.self"}
+				    ),
+				    
+				    RenamedInvoiceItemType = Table.RenameColumns(
+				    TransformedInvoice, 
+				    {
+				           {"id", "Invoice Item ID"},
+				        {"concession_type_name", "Concession Type Name"},
+				        {"discount_percentage", "Discount Percentage"},
+				        {"discounted_amount", "Discounted Amount"},
+				        {"is_monetary_discount", "Is Monetary Discount"},
+				        {"name", "Name"},
+				        {"net_price", "Net Price"},
+				        {"quantity", "Quantity"},
+				        {"tax_amount", "Tax Amount"},
+				        {"tax_name", "Tax Name"},
+				        {"tax_rate", "Tax Rate"},
+				        {"unit_price", "Unit Price"},
+				        {"total_including_tax", "Total Including Tax"},
+				        {"code", "Code"}
+				       // {"invoice", "Invoice Record"}
+				        //{"billable_item", "Billable Item Record"},
+				        //{"product", "Product Record"}
+				    }
+				)
+				
+				in
+				    RenamedInvoiceItemType
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

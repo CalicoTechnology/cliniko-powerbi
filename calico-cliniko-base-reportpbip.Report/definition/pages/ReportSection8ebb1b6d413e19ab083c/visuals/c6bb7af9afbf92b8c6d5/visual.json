@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "c6bb7af9afbf92b8c6d5",
+  "position": {
+    "x": 556.84729064039414,
+    "y": 404.33497536945811,
+    "z": 7000,
+    "height": 315.66502463054189,
+    "width": 721.77339901477831,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Appointments"
+                    }
+                  },
+                  "Property": "Starts At Local"
+                }
+              },
+              "queryRef": "Appointments.Starts At Local",
+              "nativeQueryRef": "Starts At Local"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Patients"
+                    }
+                  },
+                  "Property": "Full Name"
+                }
+              },
+              "queryRef": "Patients.Full Name",
+              "nativeQueryRef": "Patient",
+              "displayName": "Patient"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppointmentTypes"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "AppointmentTypes.Name",
+              "nativeQueryRef": "Name"
+            }
+          ],
+          "showAll": true
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "437.94507340468414D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "AppointmentTypes.Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "156.8924661972144D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Patients.Full Name"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Appointments'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

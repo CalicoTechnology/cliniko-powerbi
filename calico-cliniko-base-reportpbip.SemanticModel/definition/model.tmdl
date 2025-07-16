@@ -1,0 +1,74 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-AU
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Functions
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Functions\ChangeType2
+
+	annotation PBI_QueryGroupOrder = 0
+
+/// Errors in queries that were loaded on 10/07/2025 13:05:49.
+queryGroup 'Query Errors - 10/07/2025 13:05:49'
+
+	annotation PBI_QueryGroupOrder = 2
+
+/// Errors in queries that were loaded on 15/07/2025 11:59:18 AM.
+queryGroup 'Query Errors - 15/07/2025 11:59:18 AM'
+
+	annotation PBI_QueryGroupOrder = 3
+
+annotation PBI_QueryOrder = ["APIKey","API_BASE","TimezoneParameter","DateLimit","Diagnostics","WaitFor","ToNavigationTable","GenerateByPage","Base64Encode","GetAllPagesByNextLink","GetPage","MakeRequest","ExtractAfterLastSlash","ExpandAndTransform","ToLocalTime","ChangeType","Patients","Businesses","Appointments","ChangeType2","AppointmentTypes","Invoices","InvoiceItems","Practitioners","DateTable","Products","Billable Items","Availability Blocks","Timezone","StockAdjustments","Users","GetPageMultiple"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.144.679.0 (25.06)+ef40146207b86a826d1c72a7727a743ee37450e9
+
+annotation PBI_ProTooling = ["DevMode","DaxQueryView_Desktop","TMDL-Extension"]
+
+ref table Diagnostics
+ref table DateTableTemplate_e5f8e42b-06ca-4103-ab56-8ef3d03f78d4
+ref table Patients
+ref table Businesses
+ref table Appointments
+ref table AppointmentTypes
+ref table Invoices
+ref table InvoiceItems
+ref table Practitioners
+ref table DateTable
+ref table 'Appointment Calendar'
+ref table Products
+ref table 'Billable Items'
+ref table 'Availability Blocks'
+ref table Timezone
+ref table StockAdjustments
+ref table Calendar
+ref table Finance_Invoices
+ref table Finance_InvoiceItems
+ref table Finance_Products
+ref table Finance_BillableItems
+ref table Users
+ref table LocalDateTable_222f563c-40c9-4fb4-86f8-249bca5672ca
+ref table LocalDateTable_7a508bd4-e2f2-4a9a-bf1c-74258afbdcf0
+ref table LocalDateTable_cd6bfb80-6f06-4282-97ea-024cd6fefd51
+ref table LocalDateTable_01f51766-f31b-4936-8d8f-d736d857fcd9
+ref table LocalDateTable_7cba0d68-97a9-474a-a6d5-6aedc748a2c7
+ref table LocalDateTable_6ccedc93-e66e-4725-a3b8-be94a1fc4f84
+ref table LocalDateTable_56d1962c-eca6-41fa-ab87-0cd94de248c1
+ref table LocalDateTable_c887ef54-0070-46fd-81c9-b596b2e42dba
+ref table LocalDateTable_3cfaf5a7-7bcd-48fc-809e-df2dfe0d36b1
+ref table LocalDateTable_5b619c70-f9d9-461f-b80a-5543e33e01c4
+ref table LocalDateTable_738afe52-97f6-4524-bc64-d49b1177c1a5
+ref table LocalDateTable_3978cdc2-1622-4459-835b-ece3a9bbd149
+ref table LocalDateTable_a9b7ac0c-4dfb-4c53-8eb3-00e30e386c1e
+ref table LocalDateTable_207d47ff-d025-4235-9e15-720a794f764c
+ref table LocalDateTable_b9fb41f7-3708-4fcc-9ffe-fcb3794e74d2
+
+ref cultureInfo en-US
+

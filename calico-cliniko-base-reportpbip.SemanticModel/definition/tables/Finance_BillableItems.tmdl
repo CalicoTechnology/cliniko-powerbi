@@ -1,0 +1,60 @@
+table Finance_BillableItems
+	lineageTag: f6558f0d-5c05-4f3c-b97e-40fcc31ed360
+
+	column 'Billable Item ID'
+		lineageTag: ac701386-786e-47b2-b54e-0443cc168b71
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Billable Items[Billable Item ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Item Code'
+		lineageTag: 16335a78-4d16-4039-82a8-9747f032dcb6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Billable Items[Item Code]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Item Type'
+		lineageTag: 9a77f846-1106-4761-9f59-6c3f7521ce7b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Billable Items[Item Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		lineageTag: 4d5f74ce-1c60-424d-ba25-36ddb18d2317
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Billable Items[Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Price
+		lineageTag: cc8f86cd-3e79-4eef-aa91-1e78ea561867
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Billable Items[Price]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Created At'
+		formatString: General Date
+		lineageTag: f146b960-7c2a-4b95-bc5b-be3f7aaede7a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Billable Items[Created At]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Finance_BillableItems = calculated
+		mode: import
+		source = 'Billable Items'
+
+	annotation PBI_Id = 97131f305c534132bd4aa7e24829c225
+

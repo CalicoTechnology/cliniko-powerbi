@@ -1,0 +1,673 @@
+/// Contains patient information from Cliniko including personal details,
+/// contact information, and account settings for patient management
+table Patients
+	lineageTag: 7a54abf0-6b24-4e9f-8589-67d809873395
+
+	/// Number of visits for a patient
+	/// Measure definition appears to be incomplete
+	measure Visits
+		lineageTag: f7cca174-730b-4bbd-a965-2ceb412b595b
+
+	/// Date of last appointment for the patient
+	/// Finds the maximum start date from related appointments
+	measure DateofLastSale = maxx(RELATEDTABLE( Appointments),[Starts At])
+		formatString: General Date
+		lineageTag: 17d71bef-e932-4d8f-a34d-f2de80b332cb
+
+	/// Count of unique patients
+	/// Base measure for counting total patients
+	measure 'Count of customer' = DISTINCTCOUNT('Patients'[Patient ID])
+		lineageTag: 52f76c05-65c7-4afb-8a07-4b3ce0dc5694
+
+	/// Flag indicating if patient is new within 3 months
+	/// Returns 1 if patient created within last 90 days, 0 otherwise
+	measure 'Is New Client (3 months)' = IF(MIN(Patients[Created At]) >= [Start Date for New], 1, 0)
+		formatString: 0
+		lineageTag: a65f3f3d-af5d-4a69-9ed0-c3cc5202b295
+
+	/// Patient Value Average - appointments per new client
+	/// Calculates average appointments per new client in 3 month period
+	measure PVA = DIVIDE([Total Appointments], [New Clients (3 months)], 0)
+		lineageTag: 871dcbc2-ea82-46c2-a1c1-63bcdc192361
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Start date threshold for new client calculation
+	/// Returns date 90 days ago from today
+	measure 'Start Date for New' = TODAY() - 90  -- This gives a date 3 months ago
+		formatString: General Date
+		lineageTag: e80f2867-0a6b-479e-8276-cf253cfaff55
+
+	/// Count of new clients within 3 months
+	/// Sums patients flagged as new clients in 3 month period
+	measure 'New Clients (3 months)' = SUMX(FILTER(Patients, [Is New Client (3 months)] = 1), [Is New Client (3 months)])
+		formatString: 0
+		lineageTag: bc7b68d8-747b-4650-bdf9-3fe321462957
+
+	/// Count of appointments for the patient
+	/// Returns appointment count from related appointments table
+	measure 'Appointment Count' = ```
+			
+			IF(
+				ISBLANK(SUMX(RELATEDTABLE(Appointments), 1)),
+				0,
+				SUMX(RELATEDTABLE(Appointments), 1)
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 4837bc08-80fb-40d6-a537-19d249b8a211
+
+	/// Count of invoices for the patient
+	/// Returns invoice count from related invoices table
+	measure 'Total Invoice Sum' =
+			
+			IF(
+				ISBLANK(SUMX(RELATEDTABLE(Invoices), 1)),
+				0,
+				SUMX(RELATEDTABLE(Invoices), 1)
+			)
+		formatString: 0
+		lineageTag: 100ed1c7-deaf-4486-a2cf-fb94f16a52b7
+
+	/// Flag for patients created in current week
+	/// Returns 1 if patient created in current week, 0 otherwise
+	measure DateWeek = ```
+			var _w =  maxx(RELATEDTABLE( DateTable),[Start of Week])  
+			var _thisweek=LOOKUPVALUE(Patients[Created At],[Created At].[Date])
+			return if(_w = _thisweek,1,0)
+			```
+		lineageTag: a1463270-a402-47a0-9a97-dbeec6cbf9a6
+
+	/// Patient's email address
+	/// Text data type containing primary email for contact
+	column Email
+		dataType: string
+		lineageTag: 24c78006-39bd-4122-9fa4-6f6e8f56c02d
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's title (Mr, Ms, Dr, etc.)
+	/// Text data type containing honorific title
+	column Title
+		dataType: string
+		lineageTag: 56ddd422-b9ed-4c4b-8d6b-d6ae32832995
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's first name
+	/// Text data type containing given name
+	column 'First Name'
+		dataType: string
+		lineageTag: 17efe5c2-3796-4dcd-a846-243d8709b0d7
+		summarizeBy: none
+		sourceColumn: First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's last name
+	/// Text data type containing family name
+	column 'Last Name'
+		dataType: string
+		lineageTag: 458549de-8097-4583-ad6b-b5b7c3960911
+		summarizeBy: none
+		sourceColumn: Last Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Primary address line 1
+	/// Text data type containing street address
+	column 'Address 1'
+		dataType: string
+		lineageTag: a9af0ac7-aea7-41e6-9b97-b137c06da0d1
+		summarizeBy: none
+		sourceColumn: Address 1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Secondary address line 2
+	/// Text data type containing apartment, suite, or additional address info
+	column 'Address 2'
+		dataType: string
+		lineageTag: 4aa89ae6-d2b0-4826-bd6c-a55ae57ce5c0
+		summarizeBy: none
+		sourceColumn: Address 2
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tertiary address line 3
+	/// Text data type containing additional address information
+	column 'Address 3'
+		dataType: string
+		lineageTag: a8836835-53dc-4e3e-978a-7fd833c2969a
+		summarizeBy: none
+		sourceColumn: Address 3
+
+		annotation SummarizationSetBy = Automatic
+
+	/// City of residence
+	/// Text data type containing city name
+	column City
+		dataType: string
+		lineageTag: cc058bbe-fdd2-4740-ab5c-6f1f1648e344
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	/// State or province of residence
+	/// Text data type containing state or province
+	column State
+		dataType: string
+		lineageTag: ef17357c-7817-42a6-b650-b3d03c8dcacd
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient accepted privacy policy
+	/// Boolean data type indicating privacy policy consent
+	column 'Accepted Privacy Policy'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 146c595b-fcc2-49e1-bc41-fa894406b646
+		summarizeBy: none
+		sourceColumn: Accepted Privacy Policy
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient receives confirmation emails
+	/// Boolean data type indicating email confirmation preference
+	column 'Receives Confirmation Emails'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 081c8e86-f455-4753-908e-4a6098a13505
+		summarizeBy: none
+		sourceColumn: Receives Confirmation Emails
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient time zone
+	/// Text data type containing IANA time zone identifier
+	column 'Time Zone'
+		dataType: string
+		lineageTag: dd4d70b1-487e-4b53-84b7-64fa6cffb0bc
+		summarizeBy: none
+		sourceColumn: Time Zone
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's biological sex
+	/// Text data type containing biological sex designation
+	column Sex
+		dataType: string
+		lineageTag: f7c7e4ea-b23c-43b0-8a9c-709baf909cf4
+		summarizeBy: none
+		sourceColumn: Sex
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's gender identity
+	/// Text data type containing self-identified gender
+	column 'Gender Identity'
+		dataType: string
+		lineageTag: 8aa6d5d2-8679-4994-bce7-8bc056918624
+		summarizeBy: none
+		sourceColumn: Gender Identity
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's date of birth
+	/// Date data type for calculating age and demographic analysis
+	column 'Date of Birth'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2d79b83e-0952-40eb-bba3-9b66267a85a2
+		summarizeBy: none
+		sourceColumn: Date of Birth
+
+		variation Variation
+			isDefault
+			relationship: 37adc2bf-093e-4fb7-a1ed-317cb6154479
+			defaultHierarchy: LocalDateTable_222f563c-40c9-4fb4-86f8-249bca5672ca.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when patient record was created
+	/// DateTime data type representing account creation date
+	column 'Created At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c142e951-a88d-4528-9429-adc1ba24a3fb
+		summarizeBy: none
+		sourceColumn: Created At
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when patient record was last updated
+	/// DateTime data type representing last modification date
+	column 'Updated At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bc1cb628-4feb-4968-9811-f1e10cf5eb4c
+		summarizeBy: none
+		sourceColumn: Updated At
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when patient record was archived
+	/// DateTime data type representing archival date, null if active
+	column 'Archived At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 10849172-c65a-48b3-8c30-8c4ed028fba9
+		summarizeBy: none
+		sourceColumn: Archived At
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's full name concatenated from first and last names
+	/// Text data type calculated column for display purposes
+	column 'Full Name' = Patients[First Name] & " " & Patients[Last Name]
+		lineageTag: 43222160-ee0a-4c2a-b2bb-16d1f2b0593e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date portion of patient creation timestamp
+	/// Date data type extracted from Created At column
+	column 'Patient Created' = Patients[Created At].[Date]
+		formatString: General Date
+		lineageTag: 2321676d-bb1c-4b1e-8814-001d7199aa7e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date of last interaction with patient
+	/// Returns last appointment date or creation date if no appointments
+	column 'Last Interaction' = if(ISBLANK(Patients[DateofLastSale]),Patients[Created At],Patients[DateofLastSale])
+		formatString: dd mmmm yyyy
+		lineageTag: de90bf8b-e1bf-4ec3-86bc-706665ea1317
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	/// Medicare number
+	/// Text data type containing Medicare identification
+	column Medicare
+		dataType: string
+		lineageTag: 7151fb71-7257-4072-894b-185633595e50
+		summarizeBy: none
+		sourceColumn: Medicare
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's age calculated from date of birth
+	/// Numeric data type representing age in years
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: 89c7dc51-05d6-4377-baa8-005e9ccfe83a
+		summarizeBy: sum
+		sourceColumn: Age
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Unique identifier for each patient
+	/// Text data type containing patient ID from Cliniko system
+	column 'Patient ID'
+		dataType: string
+		lineageTag: a6400436-56d5-4777-aa0d-5210d08bb12d
+		summarizeBy: none
+		sourceColumn: Patient ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's preferred first name
+	/// Text data type containing preferred given name
+	column 'Preferred First Name'
+		dataType: string
+		lineageTag: bd22e2a3-cff9-4eab-93d1-1db30072481f
+		summarizeBy: none
+		sourceColumn: Preferred First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's occupation
+	/// Text data type containing employment or occupation details
+	column Occupation
+		dataType: string
+		lineageTag: 734195c5-18e5-4f7a-ae58-e6f48bca33d7
+		summarizeBy: none
+		sourceColumn: Occupation
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Postal code
+	/// Text data type containing zip or postal code
+	column 'Post Code'
+		dataType: string
+		lineageTag: 2c786d2b-150e-4dda-a2ae-329922cb7c4a
+		summarizeBy: none
+		sourceColumn: Post Code
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Country code (ISO 3166-1)
+	/// Text data type containing standardized country code
+	column 'Country Code'
+		dataType: string
+		lineageTag: 2327de80-2642-49dd-a5a9-d4002896f2dc
+		summarizeBy: none
+		sourceColumn: Country Code
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Emergency contact information
+	/// Text data type containing emergency contact details
+	column 'Emergency Contact'
+		dataType: string
+		lineageTag: 943bd26f-8d2a-4421-8912-25e34e9e590b
+		summarizeBy: none
+		sourceColumn: Emergency Contact
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Medicare reference number
+	/// Text data type containing Medicare reference identifier
+	column 'Medicare Reference Number'
+		dataType: string
+		lineageTag: 8c8bb66f-f182-459a-95a6-283e7ca3b286
+		summarizeBy: none
+		sourceColumn: Medicare Reference Number
+
+		annotation SummarizationSetBy = Automatic
+
+	/// DVA card number
+	/// Text data type containing Department of Veterans' Affairs card number
+	column 'DVA Card Number'
+		dataType: string
+		lineageTag: c61cde15-0788-4ab0-82b9-75b62bb24b37
+		summarizeBy: none
+		sourceColumn: DVA Card Number
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Old reference ID for migration purposes
+	/// Text data type containing legacy system identifier
+	column 'Old Reference ID'
+		dataType: string
+		lineageTag: fd3107ab-a122-4e79-9b56-b8ddaa731852
+		summarizeBy: none
+		sourceColumn: Old Reference ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Appointment notes for this patient
+	/// Text data type containing notes for scheduling
+	column 'Appointment Notes'
+		dataType: string
+		lineageTag: a849ff8f-a889-4764-8e0f-905b18deddc9
+		summarizeBy: none
+		sourceColumn: Appointment Notes
+
+		annotation SummarizationSetBy = Automatic
+
+	/// General notes about the patient
+	/// Text data type containing clinical or administrative notes
+	column Notes
+		dataType: string
+		lineageTag: 52e34c9c-3c3b-4aa2-aa4c-41b81a500172
+		summarizeBy: none
+		sourceColumn: Notes
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Invoice default recipient
+	/// Text data type indicating default invoice recipient
+	column 'Invoice Default To'
+		dataType: string
+		lineageTag: 7579e52e-2e03-48de-b179-5b8484b9b802
+		summarizeBy: none
+		sourceColumn: Invoice Default To
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Invoice email address
+	/// Text data type containing specific email for invoicing
+	column 'Invoice Email'
+		dataType: string
+		lineageTag: b42e98ea-939e-4313-a572-c800a2b08c3b
+		summarizeBy: none
+		sourceColumn: Invoice Email
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Extra information for invoices
+	/// Text data type containing additional invoice details
+	column 'Invoice Extra Information'
+		dataType: string
+		lineageTag: e54e6125-2c1c-4d94-bc62-4260a849e5e8
+		summarizeBy: none
+		sourceColumn: Invoice Extra Information
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Referral source information
+	/// Text data type containing how patient was referred
+	column 'Referral Source'
+		dataType: string
+		lineageTag: 273a0d98-4424-42c9-8f17-931956c851fa
+		summarizeBy: none
+		sourceColumn: Referral Source
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Patient's reminder preference type
+	/// Text data type containing preferred reminder method
+	column 'Reminder Type'
+		dataType: string
+		lineageTag: 0f70c2a8-f458-4b16-a4f7-cebd601c4b42
+		summarizeBy: none
+		sourceColumn: Reminder Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient accepts email marketing
+	/// Boolean data type indicating marketing consent
+	column 'Accepted Email Marketing'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1b3d5072-155a-432a-adbb-89076285f295
+		summarizeBy: none
+		sourceColumn: Accepted Email Marketing
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient accepts SMS marketing
+	/// Boolean data type indicating SMS marketing consent
+	column 'Accepted SMS Marketing'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 14174846-9f19-47c2-962c-7fb88ee28ed0
+		summarizeBy: none
+		sourceColumn: Accepted SMS Marketing
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient receives cancellation emails
+	/// Boolean data type indicating cancellation email preference
+	column 'Receives Cancellation Emails'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5965cb23-fc00-41a1-9f3d-43cb8d88754b
+		summarizeBy: none
+		sourceColumn: Receives Cancellation Emails
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when patient record was merged
+	/// DateTime data type representing merge date, null if not merged
+	column 'Merged At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0c556936-4901-4162-9fd9-007e3b796e92
+		summarizeBy: none
+		sourceColumn: Merged At
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Display label containing full patient name
+	/// Text data type with formatted patient name
+	column Label
+		dataType: string
+		lineageTag: 6a0d39dc-9bce-4412-a264-016087902a6d
+		summarizeBy: none
+		sourceColumn: Label
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Patients = m
+		mode: import
+		source = ```
+				let
+				PatientType = type table [
+				    id = text,
+				    first_name = text,
+				    last_name = text,
+				    preferred_first_name = text,
+				    title = text,
+				    email = text,
+				    date_of_birth = date,
+				    gender_identity = text,
+				    sex = text,
+				    occupation = text,
+				    address_1 = text,
+				    address_2 = text,
+				    address_3 = text,
+				    city = text,
+				    state = text,
+				    post_code = text,
+				    country_code = text,
+				    emergency_contact = text,
+				    medicare = text,
+				    medicare_reference_number = text,
+				    dva_card_number = text,
+				    time_zone = text,
+				    old_reference_id = text,
+				    appointment_notes = text,
+				    notes = text,
+				    invoice_default_to = text,
+				    invoice_email = text,
+				    invoice_extra_information = text,
+				    referral_source = text,
+				    reminder_type = text,
+				    accepted_email_marketing = logical,
+				    accepted_sms_marketing = logical,
+				    accepted_privacy_policy = logical,
+				    receives_confirmation_emails = logical,
+				    receives_cancellation_emails = logical,
+				    created_at = datetimezone,
+				    updated_at = datetimezone,
+				    archived_at = datetimezone,
+				    merged_at = datetimezone,
+				    label = text
+				    // concession_type = record,
+				    // referring_doctor = record,
+				    // merged_with_patient = record
+				],
+				 
+				     
+				     // Multiple query parameters as a list
+				    QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				
+				    Source = GetAllPagesByNextLink("patients", "patients", PatientType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, PatientType),
+				
+				    // Use the function for concession_type links
+				    // TransformedConcessionType = ExpandAndTransform(
+				    //     appliedSchema, 
+				    //     "concession_type", 
+				    //     {"links", "self"}, 
+				    //     {"concession_type.links", "concession_type.links.self"}
+				    // ),
+				    
+				    // // Use the function for referring_doctor links
+				    // TransformedReferringDoctor = ExpandAndTransform(
+				    //     TransformedConcessionType, 
+				    //     "referring_doctor", 
+				    //     {"links", "self"}, 
+				    //     {"referring_doctor.links", "referring_doctor.links.self"}
+				    // ),
+				
+				    // // Use the function for merged_with_patient links
+				    // TransformedMergedPatient = ExpandAndTransform(
+				    //     TransformedReferringDoctor, 
+				    //     "merged_with_patient", 
+				    //     {"links", "self"}, 
+				    //     {"merged_with_patient.links", "merged_with_patient.links.self"}
+				    // ),
+				
+				    RenamedTable = Table.RenameColumns(appliedSchema, {
+				        {"id", "Patient ID"},
+				        {"first_name", "First Name"},
+				        {"last_name", "Last Name"},
+				        {"preferred_first_name", "Preferred First Name"},
+				        {"title", "Title"},
+				        {"email", "Email"},
+				        {"date_of_birth", "Date of Birth"},
+				        {"gender_identity", "Gender Identity"},
+				        {"sex", "Sex"},
+				        {"occupation", "Occupation"},
+				        {"address_1", "Address 1"},
+				        {"address_2", "Address 2"},
+				        {"address_3", "Address 3"},
+				        {"city", "City"},
+				        {"state", "State"},
+				        {"post_code", "Post Code"},
+				        {"country_code", "Country Code"},
+				        {"emergency_contact", "Emergency Contact"},
+				        {"medicare", "Medicare"},
+				        {"medicare_reference_number", "Medicare Reference Number"},
+				        {"dva_card_number", "DVA Card Number"},
+				        {"time_zone", "Time Zone"},
+				        {"old_reference_id", "Old Reference ID"},
+				        {"appointment_notes", "Appointment Notes"},
+				        {"notes", "Notes"},
+				        {"invoice_default_to", "Invoice Default To"},
+				        {"invoice_email", "Invoice Email"},
+				        {"invoice_extra_information", "Invoice Extra Information"},
+				        {"referral_source", "Referral Source"},
+				        {"reminder_type", "Reminder Type"},
+				        {"accepted_email_marketing", "Accepted Email Marketing"},
+				        {"accepted_sms_marketing", "Accepted SMS Marketing"},
+				        {"accepted_privacy_policy", "Accepted Privacy Policy"},
+				        {"receives_confirmation_emails", "Receives Confirmation Emails"},
+				        {"receives_cancellation_emails", "Receives Cancellation Emails"},
+				        {"created_at", "Created At"},
+				        {"updated_at", "Updated At"},
+				        {"archived_at", "Archived At"},
+				        {"merged_at", "Merged At"},
+				        {"label", "Label"}
+				    }),
+				    #"Changed Type" = Table.TransformColumnTypes(RenamedTable,{{"Date of Birth", type datetime}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Age", each (Duration.TotalDays(DateTime.LocalNow() - [Date of Birth]))/ 365)
+				
+				in
+				    #"Added Custom"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,798 @@
+/// Contains appointment data from Cliniko including scheduling, cancellation,
+/// and attendance information for reporting and analysis purposes
+table Appointments
+	lineageTag: 4c617707-5872-48d4-adf8-87d6c4af52c5
+
+	/// Counts the total number of appointments in the table
+	/// Returns integer count of all appointment records
+	measure 'Total Appointments' = ```
+			COUNTROWS(Appointments)
+			
+			```
+		formatString: 0
+		lineageTag: f79585d0-6a0a-48ca-a010-5d723e37caf3
+
+	/// Calculates year-to-date count of appointment IDs
+	/// Uses TOTALYTD function with DateTable for time intelligence
+	measure 'Count of id YTD' =
+			
+			TOTALYTD(COUNTA('Appointments'[id]), 'DateTable'[Date])
+		formatString: 0
+		lineageTag: aae89e91-a0ae-4f79-986a-19c0481a9b78
+
+	/// Calculates year-over-year percentage change in appointment counts
+	/// Compares current year appointments to previous year
+	measure 'Count of id YoY%' =
+			
+			VAR __PREV_YEAR =
+				CALCULATE(
+					COUNTA('Appointments'[id]),
+					DATEADD('DateTable'[Date], -1, YEAR)
+				)
+			RETURN
+				DIVIDE(COUNTA('Appointments'[id]) - __PREV_YEAR, __PREV_YEAR)
+		lineageTag: c29c119d-c50b-4906-9bef-14637da3cf31
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Year-to-date count of appointments for the same period last year
+	/// Used for comparing current YTD performance with prior year YTD
+	measure 'Count of id LY YTD' =
+			
+			TOTALYTD(COUNTA('Appointments'[id]),SAMEPERIODLASTYEAR( 'DateTable'[Date]))
+		formatString: 0
+		lineageTag: 7452f838-949e-4417-9d66-e3eaebf04049
+
+	/// Sum of appointment hours using the calculated Hours column
+	/// Base measure for time-based calculations
+	measure HoursM = SUM([Hours])
+		lineageTag: 2504a264-6c83-45c6-aa1e-22c738f296ee
+
+	/// Year-to-date hours for the same period last year
+	/// Enables comparison of current YTD hours with prior year YTD hours
+	measure 'Hours YTD LY' = TOTALYTD( [HoursM] , SAMEPERIODLASTYEAR('DateTable'[Date] ) )
+		lineageTag: 9b5b295b-18c8-4a5e-a725-80158b9ab65a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Year-to-date total hours for current year
+	/// Cumulative hours from start of year to selected date
+	measure 'Hours YTD' = TOTALYTD( [HoursM] , DateTable[Date] )
+		lineageTag: 60ca91f0-f190-4bfc-a02b-7e110cc0f630
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Hours for the previous month
+	/// Used for month-over-month comparison calculations
+	measure 'Hours LM' = CALCULATE( [HoursM] , PREVIOUSMONTH( 'DateTable'[Date]))
+		lineageTag: c5f6f3bd-b93c-4bb5-9daa-cad631df0b30
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Change in hours from previous month to current month
+	/// Calculated as current month hours minus last month hours
+	measure 'Hours Chg' = [HoursM] - [Hours LM]
+		lineageTag: 946392a3-bd4b-4f33-90ff-a867782d2f74
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Percentage of appointments that were cancelled
+	/// Calculates ratio of cancelled appointments to total appointments
+	measure 'Cancellation Percentage' = (COUNT(Appointments[Cancelled At])/COUNT(Appointments[ID]))*100
+		lineageTag: 6f389802-a648-45f6-b22c-48cb822e8651
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Count of appointments scheduled for future dates
+	/// Uses last selected date as reference point for future calculations
+	measure NumberOfFutureAppointments =
+			
+			
+			var var_LastDateSelected = LASTDATE(DateTable[Date])
+			
+			RETURN
+			
+			CALCULATE(
+			    COUNTROWS(Appointments),
+			    ALL(DateTable),
+			    Appointments[AppointmentDate] > var_LastDateSelected
+			)
+		formatString: 0
+		lineageTag: cf449edf-6027-4a5b-80e3-279dd4718815
+
+	/// Count of appointments scheduled from today onwards
+	/// Filters appointments where appointment date is >= today
+	measure 'Future Appointments' = ```
+			
+			VAR _seldate =
+			    SELECTEDVALUE ( 'Appointment Calendar'[AppointmentDate].[Date] )
+			RETURN
+			    CALCULATE (
+			        COUNT ( Appointments[ID] ),
+			        FILTER (
+			            Appointments,
+			            Appointments[AppointmentDate] >= TODAY()
+			                 
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: a99a2aa0-048e-4086-b290-b9d9e620ee97
+
+	/// Count of future appointments for a specific practitioner
+	/// Filters by selected practitioner and future dates from today
+	measure 'Future Practitioner Appointments' = ```
+			
+			VAR _seldate =
+			    SELECTEDVALUE ( 'Appointment Calendar'[AppointmentDate].[Date] )
+			VAR _selpract =
+			    SELECTEDVALUE ( 'Appointments'[practitioner.links.self] )
+			RETURN
+			    CALCULATE (
+			        COUNT ( Appointments[ID] ),
+			        FILTER (
+			            ALL(Appointments),
+			            Appointments[AppointmentDate] >= TODAY() && Appointments[practitioner.links.self] =_selpract
+			                 
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: aed185f9-a891-421d-8b24-3aef1044c26a
+
+	/// Percentage of appointments that are first appointments for patients
+	/// Calculates ratio of first appointments to total appointments
+	measure MPVA2 = SUMX(Appointments,[First Appointment])/[Total Appointments]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 354cba74-6628-4ad8-99e5-f2a4edc75247
+
+	/// Unique identifier for each appointment record
+	/// Text data type containing appointment ID from Cliniko system
+	column ID
+		dataType: string
+		lineageTag: 6880c915-65d5-4e86-8049-84297ee8d88a
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Scheduled start date and time for the appointment
+	/// DateTime data type with timezone information from Cliniko
+	column 'Starts At'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 52ed1d7e-14de-4c62-bcb7-a72721e4fd14
+		summarizeBy: none
+		sourceColumn: Starts At
+
+		variation Variation
+			isDefault
+			relationship: 9d4d400f-7723-459d-a327-5001efbc14e4
+			defaultHierarchy: LocalDateTable_5b619c70-f9d9-461f-b80a-5543e33e01c4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Scheduled end date and time for the appointment
+	/// DateTime data type with timezone information from Cliniko
+	column 'Ends At'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5f486c4f-5e91-4e0f-9350-2a40b59e6c57
+		summarizeBy: none
+		sourceColumn: Ends At
+
+		variation Variation
+			isDefault
+			relationship: 5aded1bc-4cd4-4c4a-a739-207a07bba183
+			defaultHierarchy: LocalDateTable_a9b7ac0c-4dfb-4c53-8eb3-00e30e386c1e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Category classification for the appointment type
+	/// Text data type containing appointment category from Cliniko
+	column Category
+		dataType: string
+		lineageTag: c40dda13-bea0-4b4a-9db9-50c97706e37b
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Color code used for display purposes in calendars
+	/// Text data type containing hex color code or color name
+	column Color
+		dataType: string
+		lineageTag: f706b5eb-8db9-4662-8eb9-6f37a7b05b9f
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Duration of the appointment in minutes
+	/// Numeric data type representing appointment length
+	column 'Duration (Minutes)'
+		dataType: double
+		lineageTag: f20ec680-93fa-4291-bf38-89fe3ddf6fa2
+		summarizeBy: sum
+		sourceColumn: Duration (Minutes)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Name or title of the appointment
+	/// Text data type containing appointment name from Cliniko
+	column Name
+		dataType: string
+		lineageTag: a88419a4-b1ac-4e89-9dce-eb9e4596cca9
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Detailed description of the appointment
+	/// Text data type containing appointment description from Cliniko
+	column Description
+		dataType: string
+		lineageTag: b5920db0-38ee-40f4-876f-435ca9eebdd9
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Maximum number of attendees allowed for the appointment
+	/// Numeric data type representing capacity limit
+	column 'Max Attendees'
+		dataType: double
+		lineageTag: c11748e8-a89b-4405-824a-48d1ba4a57ad
+		summarizeBy: sum
+		sourceColumn: Max Attendees
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether appointment is visible in online booking system
+	/// Boolean data type indicating online booking availability
+	column 'Show in Online Bookings'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a1795ee7-e913-4a87-ac96-0fbd4ce33c38
+		summarizeBy: none
+		sourceColumn: Show in Online Bookings
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether deposit should be added to account credit
+	/// Boolean data type for deposit handling configuration
+	column 'Add Deposit to Account Credit'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3c9738aa-2edd-485f-b280-71da8df5e677
+		summarizeBy: none
+		sourceColumn: Add Deposit to Account Credit
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Required deposit amount for the appointment
+	/// Numeric data type representing deposit price in currency
+	column 'Deposit Price'
+		dataType: double
+		lineageTag: f3f42ebf-170a-4486-9161-c19ba3bdf5f4
+		summarizeBy: sum
+		sourceColumn: Deposit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Lead time required for online bookings in hours
+	/// Numeric data type representing minimum advance booking time
+	column 'Online Bookings Lead Time (Hours)'
+		dataType: double
+		lineageTag: aaa5797d-f589-4890-a548-e1c21fa2fe68
+		summarizeBy: sum
+		sourceColumn: Online Bookings Lead Time (Hours)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether online payments are enabled for this appointment
+	/// Boolean data type indicating payment configuration
+	column 'Online Payments Enabled'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0cb1d12e-f63b-4b8f-ac54-352e00e2609e
+		summarizeBy: none
+		sourceColumn: Online Payments Enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mode of online payment processing
+	/// Text data type containing payment mode configuration
+	column 'Online Payments Mode'
+		dataType: string
+		lineageTag: fc88e79d-7f3b-486c-a8ba-da2a267a2fc5
+		summarizeBy: none
+		sourceColumn: Online Payments Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether telehealth is enabled for this appointment
+	/// Boolean data type indicating telehealth availability
+	column 'Telehealth Enabled'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 94fe5711-2c1f-405f-80ef-57876c423c04
+		summarizeBy: none
+		sourceColumn: Telehealth Enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Note provided when appointment was cancelled
+	/// Text data type containing cancellation explanation
+	column 'Cancellation Note'
+		dataType: string
+		lineageTag: e95a0b63-d466-4bde-8282-b5d1ce78faa9
+		summarizeBy: none
+		sourceColumn: Cancellation Note
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reason code for appointment cancellation
+	/// Text data type containing standardized cancellation reason
+	column 'Cancellation Reason'
+		dataType: string
+		lineageTag: 3f914f80-d283-44a2-9653-aea91a84f00c
+		summarizeBy: none
+		sourceColumn: Cancellation Reason
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Detailed description of cancellation reason
+	/// Text data type containing extended cancellation explanation
+	column 'Cancellation Reason Description'
+		dataType: string
+		lineageTag: f13f9e50-96f4-4e3b-a8b1-8d2a0469fc82
+		summarizeBy: none
+		sourceColumn: Cancellation Reason Description
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date and time when appointment was cancelled
+	/// DateTime data type, null if appointment was not cancelled
+	column 'Cancelled At'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ab4fd13e-2b95-4149-bad3-4bc1920d1360
+		summarizeBy: none
+		sourceColumn: Cancelled At
+
+		variation Variation
+			isDefault
+			relationship: 91988f46-5bc5-460e-9e81-b51c6cd020f8
+			defaultHierarchy: LocalDateTable_3978cdc2-1622-4459-835b-ece3a9bbd149.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Status of treatment note completion
+	/// Numeric data type representing treatment note state
+	column 'Treatment Note Status'
+		dataType: double
+		lineageTag: 3dfe9f0e-f36a-487b-ae49-ca907f3a9c20
+		summarizeBy: sum
+		sourceColumn: Treatment Note Status
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Whether SMS reminder was sent for this appointment
+	/// Boolean data type indicating SMS reminder status
+	column 'SMS Reminder Sent'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5a6d798d-36b0-414a-8ab4-80078619ad6a
+		summarizeBy: none
+		sourceColumn: SMS Reminder Sent
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether email reminder was sent for this appointment
+	/// Boolean data type indicating email reminder status
+	column 'Email Reminder Sent'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d02d2406-842a-4e9a-928f-b6bb25042df1
+		summarizeBy: none
+		sourceColumn: Email Reminder Sent
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient failed to arrive for appointment
+	/// Boolean data type indicating no-show status
+	column 'Did Not Arrive'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8e2a4280-8ef3-4b40-b957-f8bb6cd30337
+		summarizeBy: none
+		sourceColumn: Did Not Arrive
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether patient arrived for the appointment
+	/// Boolean data type indicating patient attendance
+	column 'Patient Arrived'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: db0033ed-48c5-45fc-857a-6f579a25c6ad
+		summarizeBy: none
+		sourceColumn: Patient Arrived
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whether online booking policy was accepted
+	/// Boolean data type indicating policy acceptance status
+	column 'Online Booking Policy Accepted'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1e27d720-4ad5-426a-bcb5-6c32f1b86197
+		summarizeBy: none
+		sourceColumn: Online Booking Policy Accepted
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Status of invoice associated with appointment
+	/// Numeric data type representing invoice state
+	column 'Invoice Status'
+		dataType: double
+		lineageTag: b3b49069-947a-4788-b964-8251cd38e0ef
+		summarizeBy: sum
+		sourceColumn: Invoice Status
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Reference link to appointment type in Cliniko system
+	/// Text data type containing appointment type URL reference
+	column 'appointment_type.links.self'
+		dataType: string
+		lineageTag: 08a72761-2a27-4050-ad8e-310289ec4900
+		summarizeBy: none
+		sourceColumn: appointment_type.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date portion of appointment start time for grouping
+	/// Date data type calculated from Starts At Local column
+	column AppointmentDate = Appointments[Starts At Local].[Date]
+		formatString: General Date
+		lineageTag: 7ebcd8a4-6804-4f06-b68b-adf6041945f4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to patient record in Cliniko system
+	/// Text data type containing patient URL reference
+	column 'patient.links.self'
+		dataType: string
+		lineageTag: 4a8210cb-eaae-434d-b02d-239d73f94387
+		summarizeBy: none
+		sourceColumn: patient.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to practitioner record in Cliniko system
+	/// Text data type containing practitioner URL reference
+	column 'practitioner.links.self'
+		dataType: string
+		lineageTag: 055a2d42-2cee-4e48-8b87-034b6feb2979
+		summarizeBy: none
+		sourceColumn: practitioner.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to business record in Cliniko system
+	/// Text data type containing business URL reference
+	column 'business.links.self'
+		dataType: string
+		lineageTag: bf36de8b-3b1a-4040-a73e-b8487fa52e90
+		summarizeBy: none
+		sourceColumn: business.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Duration of appointment converted to hours
+	/// Numeric data type calculated from Duration divided by 60
+	column Hours = Appointments[Duration] /60
+		lineageTag: deb6bc7a-eec6-4e06-9525-294e550a64e4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Duration in minutes calculated from start and end times
+	/// Numeric data type using DATEDIFF function
+	column Duration = DATEDIFF(  Appointments[Starts At], Appointments[Ends At],MINUTE)
+		formatString: 0
+		lineageTag: fb50c463-db56-4646-9ef4-1afdb1c59242
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Days between cancellation and appointment date
+	/// Date data type showing cancellation lead time
+	column CancellationLeadTimeDays = ```
+			
+			IF(
+			    ISBLANK( Appointments[Cancelled At] ),
+			    BLANK(),
+			    DATEDIFF(
+			        Appointments[AppointmentDate],
+			        Appointments[Cancelled At],
+			        DAY
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 42a82c73-5145-410f-8c39-79f06d63971b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Boolean flag indicating cancellation on same day as appointment
+	/// Boolean data type comparing cancellation and appointment dates
+	column CancelledSameDay = Appointments[Cancelled At].[Date] == Appointments[Starts At].[Date]
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d4dada0b-8e82-4de2-8dac-fc8b43b68201
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Count of same-day cancellations for aggregation
+	/// Numeric data type (0 or 1) for counting same-day cancellations
+	column CancelledSameDayCount = if(Appointments[CancelledSameDay]=true,1,0)
+		formatString: 0
+		lineageTag: 1a8618ad-2802-4c6a-a92d-f32f9226e723
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Count of no-show appointments for aggregation
+	/// Numeric data type (0 or 1) for counting no-show appointments
+	column 'Did Not Arrive Count' = if(Appointments[Did Not Arrive]=true,1,0)
+		formatString: 0
+		lineageTag: 58c642e8-a21e-47db-9d17-bfe42eb63502
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Count of completed appointments for aggregation
+	/// Numeric data type (0 or 1) for counting completed appointments
+	column CompletedAppointment = if(ISBLANK(Appointments[Cancelled At]) && Appointments[Did Not Arrive]=false  ,1,0)
+		formatString: 0
+		lineageTag: 4de4520c-2ae5-481f-9dc0-0fc5dc41ab9c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Flag indicating if this is patient's first appointment
+	/// Numeric data type (0 or 1) using RANKX to identify first visits
+	column 'First Appointment' = ```
+			
+			IF(
+			    RANKX(
+			        FILTER(Appointments, Appointments[patient.links.self] = EARLIER(Appointments[patient.links.self])),
+			        Appointments[AppointmentDate],
+			        , 
+			        ASC,
+			        DENSE
+			    ) = 1, 
+			    1, 
+			    0
+			)
+			
+			```
+		formatString: 0
+		lineageTag: d4371f03-13ae-4308-b3b0-c2af0c71743a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	/// End time converted to local timezone
+	/// DateTime data type adjusted for local time zone
+	column 'Ends At Local'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 20b773f3-623c-4cc4-9853-b5f5d7739b66
+		summarizeBy: none
+		sourceColumn: Ends At Local
+
+		variation Variation
+			isDefault
+			relationship: 9c886ef9-57b6-4762-8d23-2bf26fe5dcb6
+			defaultHierarchy: LocalDateTable_207d47ff-d025-4235-9e15-720a794f764c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Start time converted to local timezone
+	/// DateTime data type adjusted for local time zone
+	column 'Starts At Local'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: aa5e5384-3a05-4e30-a77e-2eb0ff40253a
+		summarizeBy: none
+		sourceColumn: Starts At Local
+
+		variation Variation
+			isDefault
+			relationship: 2d06f9e5-55ce-454b-bf9e-365c338553fe
+			defaultHierarchy: LocalDateTable_738afe52-97f6-4524-bc64-d49b1177c1a5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'AppointmentDate Hierarchy'
+		lineageTag: ac7d6ca8-e96e-4754-9512-b39a998cf011
+
+		level AppointmentDate
+			lineageTag: fefafcd5-7d83-4d92-92f0-8bce53510e11
+			column: AppointmentDate
+
+	partition Appointments = m
+		mode: import
+		source = ```
+				let
+				 
+				
+				AppointmentType = type table [
+				    id = text,
+				    starts_at = datetimezone,
+				    ends_at = datetimezone,
+				    category = text,
+				    color = text,
+				    duration_in_minutes = number,
+				    name = text,
+				    description = text,
+				    max_attendees = number,
+				    show_in_online_bookings = logical,
+				    add_deposit_to_account_credit = logical,
+				    deposit_price = number,
+				    online_bookings_lead_time_hours = number,
+				    online_payments_enabled = logical,
+				    online_payments_mode = text,
+				    telehealth_enabled = logical,
+				    cancellation_note = text,
+				    cancellation_reason = number,
+				    cancellation_reason_description = text,    
+				    cancelled_at = nullable datetimezone,
+				    patient = record,
+				    practitioner = record,
+				    appointment_type = nullable record,
+				    business = record,
+				    attendees = record,
+				    treatment_note_status = number,
+				    sms_reminder_sent = logical,
+				    email_reminder_sent = logical,
+				    did_not_arrive = logical,
+				    // repeats
+				    // repeat_rule
+				    patient_arrived = logical,
+				    online_booking_policy_accepted = logical,
+				    invoice_status = number
+				],
+				
+				    //Get ALL appointments, this can take time if you have alot of appointments, 
+				    //Source = GetAllPagesByNextLink("appointments", "appointments",AppointmentType),
+				
+				    // Get appointments updated after a specific date
+				    // Convert DateLimit parameter to UTC Z format
+				    DateLimitUTC = DateTime.ToText(DateLimit, "yyyy-MM-ddTHH:mm:ssZ"),
+				
+				     // Multiple query parameters as a list
+				    QueryFilters = {
+				        "updated_at:>" & DateLimitUTC,
+				        "archived_at:*",
+				        "cancelled_at:*"
+				    },
+				   
+				    Source = GetAllPagesByNextLink("appointments", "appointments", AppointmentType, QueryFilters),
+				    appliedSchema = ChangeType2(Source, AppointmentType),
+				
+				
+				 // Use the function for practitioner links
+				    TransformedPractitioner = ExpandAndTransform(
+				        appliedSchema, 
+				        "practitioner", 
+				        {"links", "self"}, 
+				        {"practitioner.links", "practitioner.links.self"}
+				    ),
+				    // Use the function for patient links
+				    TransformedPatient = ExpandAndTransform(
+				        TransformedPractitioner, 
+				        "patient", 
+				        {"links", "self"}, 
+				        {"patient.links", "patient.links.self"}
+				    ),
+				
+				    TransformedBusiness = ExpandAndTransform(
+				        TransformedPatient, 
+				        "business", 
+				        {"links", "self"}, 
+				        {"business.links", "business.links.self"}
+				    ),
+				
+				   TransformedAppointmentType = ExpandAndTransform(
+				        TransformedBusiness, 
+				        "appointment_type", 
+				        {"links", "self"}, 
+				        {"appointment_type.links", "appointment_type.links.self"}
+				    ),
+				
+				 RenamedAppointmentType = Table.RenameColumns(
+				    TransformedAppointmentType, 
+				    {
+				        {"id", "ID"},
+				        {"starts_at", "Starts At"},
+				        {"ends_at", "Ends At"},
+				        {"category", "Category"},
+				        {"color", "Color"},
+				        {"duration_in_minutes", "Duration (Minutes)"},
+				        {"name", "Name"},
+				        {"description", "Description"},
+				        {"max_attendees", "Max Attendees"},
+				        {"show_in_online_bookings", "Show in Online Bookings"},
+				        {"add_deposit_to_account_credit", "Add Deposit to Account Credit"},
+				        {"deposit_price", "Deposit Price"},
+				        {"online_bookings_lead_time_hours", "Online Bookings Lead Time (Hours)"},
+				        {"online_payments_enabled", "Online Payments Enabled"},
+				        {"online_payments_mode", "Online Payments Mode"},
+				        {"telehealth_enabled", "Telehealth Enabled"},
+				        {"cancellation_note", "Cancellation Note"},
+				        {"cancellation_reason", "Cancellation Reason"},
+				        {"cancellation_reason_description", "Cancellation Reason Description"},
+				        {"cancelled_at", "Cancelled At"},
+				       // {"patient", "Patient Record"},
+				       // {"practitioner", "Practitioner Record"},
+				       // {"appointment_type", "Appointment Type Record"},
+				       // {"business", "Business Record"},
+				        {"attendees", "Attendees Record"},
+				        {"treatment_note_status", "Treatment Note Status"},
+				        {"sms_reminder_sent", "SMS Reminder Sent"},
+				        {"email_reminder_sent", "Email Reminder Sent"},
+				        {"did_not_arrive", "Did Not Arrive"},
+				        {"patient_arrived", "Patient Arrived"},
+				        {"online_booking_policy_accepted", "Online Booking Policy Accepted"},
+				        {"invoice_status", "Invoice Status"}
+				    }
+				),
+				    Replacements = [10="Feeling Better", 20="Condition worse", 30="Sick"],
+				    #"Changed Type" = Table.TransformColumnTypes(RenamedAppointmentType,{{"Cancellation Reason", type text}}),
+				
+				   // ReplacedValues = List.ReplaceMatchingItems(Source, Replacements, {"Cancellation Reason"})
+				
+				    #"Replaced Value1" = Table.ReplaceValue(#"Changed Type","10","Feeling better",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","20","Condition worse",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","30","Sick",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value4" = Table.ReplaceValue(#"Replaced Value3","31","COVID-19 related",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value5" = Table.ReplaceValue(#"Replaced Value4","40","Away",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value6" = Table.ReplaceValue(#"Replaced Value5","50","Work",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Replaced Value7" = Table.ReplaceValue(#"Replaced Value6","60","Other",Replacer.ReplaceText,{"Cancellation Reason"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value7",{{"Starts At", type datetimezone}, {"Ends At", type datetimezone}}),
+				    //#"Added Custom" = Table.AddColumn(#"Changed Type1", "Start At Local", each DateTimeZone.ToLocal([Starts At])),
+				    //#"Changed Type2" = Table.TransformColumnTypes(#"Added Custom",{{"Start At Local", type datetimezone}}),
+				    //#"Added Custom1" = Table.AddColumn(#"Changed Type2", "Ends At Local", each DateTimeZone.ToLocal([Ends At])),
+				    //#"Changed Type3" = Table.TransformColumnTypes(#"Added Custom1",{{"Ends At Local", type datetimezone}}),
+				    #"Added Custom2" = Table.AddColumn(#"Changed Type1", "Starts At Local", each ToLocalTime([Starts At])),
+				    #"Changed Type4" = Table.TransformColumnTypes(#"Added Custom2",{{"Starts At Local", type datetime}}),
+				     #"Added Custom3" = Table.AddColumn(#"Changed Type4", "Ends At Local", each ToLocalTime([Ends At])),
+				    #"Changed Type5" = Table.TransformColumnTypes(#"Added Custom3",{{"Ends At Local", type datetime}})
+				in
+				    #"Changed Type5"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

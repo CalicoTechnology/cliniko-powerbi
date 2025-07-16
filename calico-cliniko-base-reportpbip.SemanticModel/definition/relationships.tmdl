@@ -1,0 +1,132 @@
+relationship 97682f77-a4bd-4e14-a322-c33c38954631
+	fromColumn: Appointments.AppointmentDate
+	toColumn: DateTable.Date
+
+relationship 6621312e-407a-4fc9-ba2a-14d2715423c8
+	fromColumn: Appointments.'business.links.self'
+	toColumn: Businesses.ID
+
+relationship d46ab781-51dd-4cc8-914e-f79cb123e824
+	fromColumn: Appointments.'patient.links.self'
+	toColumn: Patients.'Patient ID'
+
+relationship 1ad18d60-d18f-40cb-ac04-abfd7ff52bc0
+	fromColumn: Appointments.'practitioner.links.self'
+	toColumn: Practitioners.'Practitioner ID'
+
+relationship a96b57be-c0b9-4a67-bab3-65556bf9af7f
+	fromColumn: Appointments.'appointment_type.links.self'
+	toColumn: AppointmentTypes.ID
+
+relationship a97a2e09-d2dc-42df-a724-5a7d40155a4c
+	crossFilteringBehavior: bothDirections
+	fromColumn: Invoices.'appointment.links.self'
+	toColumn: Appointments.ID
+
+relationship 86566c81-c5aa-4443-8d71-c32b09d9d53d
+	fromColumn: InvoiceItems.'invoice.links.self'
+	toColumn: Invoices.'Invoice ID'
+
+relationship c8490618-569e-4d9b-b9b1-7eccbc10377c
+	fromColumn: InvoiceItems.'billable_item.links.self'
+	toColumn: 'Billable Items'.'Billable Item ID'
+
+relationship 9691e8ee-167a-2852-6b22-0d4dde2a6eeb
+	fromColumn: StockAdjustments.'product.links.self'
+	toColumn: Products.'Product Item ID'
+
+relationship 16dd710f-58a8-3c0e-6f87-cf9d6ac25700
+	fromColumn: StockAdjustments.StockDate
+	toColumn: Calendar.Date
+
+relationship 08e5d637-cf23-18b1-51cc-e613de190e7d
+	fromColumn: Finance_InvoiceItems.'invoice.links.self'
+	toColumn: Finance_Invoices.'Invoice ID'
+
+relationship d548738c-bc0f-5cf7-9ef1-22ba6a3ec485
+	fromColumn: Finance_InvoiceItems.'product.links.self'
+	toColumn: Finance_Products.'Product Item ID'
+
+relationship b10c1fad-f92d-e469-90ee-7d505252a398
+	fromColumn: Finance_InvoiceItems.'billable_item.links.self'
+	toColumn: Finance_BillableItems.'Billable Item ID'
+
+relationship b418093c-c939-168e-6510-28a2200b34a1
+	fromColumn: InvoiceItems.'product.links.self'
+	toColumn: Products.'Product Item ID'
+
+relationship 37adc2bf-093e-4fb7-a1ed-317cb6154479
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Patients.'Date of Birth'
+	toColumn: LocalDateTable_222f563c-40c9-4fb4-86f8-249bca5672ca.Date
+
+relationship d301ba9c-b6d8-45f9-979e-868278323bfc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: StockAdjustments.'Archived At'
+	toColumn: LocalDateTable_7a508bd4-e2f2-4a9a-bf1c-74258afbdcf0.Date
+
+relationship 082d4c20-86b8-4731-944a-903ec9719fbb
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Products.'Created At1'
+	toColumn: LocalDateTable_cd6bfb80-6f06-4282-97ea-024cd6fefd51.Date
+
+relationship 131359a2-fe60-40e5-a385-7da0b7a73531
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Finance_Products.'Created At1'
+	toColumn: LocalDateTable_01f51766-f31b-4936-8d8f-d736d857fcd9.Date
+
+relationship 785c36eb-7bf3-43c7-b758-6d93655bc3a0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Products.'Archived At'
+	toColumn: LocalDateTable_7cba0d68-97a9-474a-a6d5-6aedc748a2c7.Date
+
+relationship f8310fac-0919-4e24-9e56-3f9aa3d49833
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Products.'Updated At'
+	toColumn: LocalDateTable_6ccedc93-e66e-4725-a3b8-be94a1fc4f84.Date
+
+relationship ed01560d-eb7a-4f60-af0f-e83a91611ecd
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Finance_Products.'Archived At'
+	toColumn: LocalDateTable_56d1962c-eca6-41fa-ab87-0cd94de248c1.Date
+
+relationship 461195e0-8a88-41c6-a44f-94e2b8b46f83
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Finance_Products.'Updated At'
+	toColumn: LocalDateTable_c887ef54-0070-46fd-81c9-b596b2e42dba.Date
+
+relationship 23cecd88-66d5-4c3c-b955-297dd57c1352
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Users.'Created at'
+	toColumn: LocalDateTable_3cfaf5a7-7bcd-48fc-809e-df2dfe0d36b1.Date
+
+relationship 9d4d400f-7723-459d-a327-5001efbc14e4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Appointments.'Starts At'
+	toColumn: LocalDateTable_5b619c70-f9d9-461f-b80a-5543e33e01c4.Date
+
+relationship 2d06f9e5-55ce-454b-bf9e-365c338553fe
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Appointments.'Starts At Local'
+	toColumn: LocalDateTable_738afe52-97f6-4524-bc64-d49b1177c1a5.Date
+
+relationship 91988f46-5bc5-460e-9e81-b51c6cd020f8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Appointments.'Cancelled At'
+	toColumn: LocalDateTable_3978cdc2-1622-4459-835b-ece3a9bbd149.Date
+
+relationship 5aded1bc-4cd4-4c4a-a739-207a07bba183
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Appointments.'Ends At'
+	toColumn: LocalDateTable_a9b7ac0c-4dfb-4c53-8eb3-00e30e386c1e.Date
+
+relationship 9c886ef9-57b6-4762-8d23-2bf26fe5dcb6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Appointments.'Ends At Local'
+	toColumn: LocalDateTable_207d47ff-d025-4235-9e15-720a794f764c.Date
+
+relationship adbf554f-3a43-4d42-9e30-c35850288227
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Appointment Calendar'.AppointmentDate
+	toColumn: LocalDateTable_b9fb41f7-3708-4fcc-9ffe-fcb3794e74d2.Date
+

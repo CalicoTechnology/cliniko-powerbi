@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "41a7c0bd73c23cec0480",
+  "position": {
+    "x": 293.97129186602871,
+    "y": 535.88516746411483,
+    "z": 11000,
+    "height": 185.26315789473685,
+    "width": 986.02870813397135,
+    "tabOrder": 11000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "InvoiceItems"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "InvoiceItems.Name",
+              "nativeQueryRef": "Name"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "InvoiceItems"
+                        }
+                      },
+                      "Property": "Total Including Tax"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(InvoiceItems.Total Including Tax)",
+              "nativeQueryRef": "Sum of Total Including Tax"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "383.2105249998105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "InvoiceItems.Name"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

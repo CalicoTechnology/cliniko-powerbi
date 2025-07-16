@@ -1,0 +1,152 @@
+/// Contains practitioner information from Cliniko including contact details,
+/// names, and professional credentials for healthcare providers
+table Practitioners
+	lineageTag: f39b2dc3-53e6-4ff0-bc52-e24ab3b68b2b
+
+	/// Unique identifier for each practitioner
+	/// Text data type containing practitioner ID from Cliniko system
+	column 'Practitioner ID'
+		dataType: string
+		lineageTag: d1e52c4e-3d49-4362-8323-e5e7985ef789
+		summarizeBy: none
+		sourceColumn: Practitioner ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Practitioner's professional title (Dr, Mr, Ms, etc.)
+	/// Text data type containing honorific or professional title
+	column Title
+		dataType: string
+		lineageTag: 1e2b375f-bed8-4beb-b40f-fd3ba42bda57
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Practitioner's first name
+	/// Text data type containing given name
+	column 'First Name'
+		dataType: string
+		lineageTag: 19fb63d7-3378-4dc9-a3e2-df338789e0be
+		summarizeBy: none
+		sourceColumn: First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Practitioner's last name
+	/// Text data type containing family name
+	column 'Last Name'
+		dataType: string
+		lineageTag: 2f0e2a66-01e8-46d0-b675-5de9f6b72ac4
+		summarizeBy: none
+		sourceColumn: Last Name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the practitioner record was created
+	/// DateTime data type representing practitioner creation date
+	column 'Created at'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8cecefdc-2c1a-4a13-bf1a-0c349519a445
+		summarizeBy: none
+		sourceColumn: Created at
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date when the practitioner record was last updated
+	/// DateTime data type representing last modification date
+	column 'Updated at'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 755bcd98-b429-40f6-8931-bd2d8c900d5b
+		summarizeBy: none
+		sourceColumn: Updated at
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Practitioner's full name concatenated from first and last names
+	/// Text data type calculated column for display purposes
+	column 'Full Name' = Practitioners[First Name] &" " & Practitioners[Last Name]
+		lineageTag: 69d20425-1374-43b0-9b86-1e77de99abbc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Display name'
+		dataType: string
+		lineageTag: dc37a19d-4cc7-4d5e-8f8b-49661bf2cc98
+		summarizeBy: none
+		sourceColumn: Display name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Designation
+		dataType: string
+		lineageTag: c6ce973a-61d3-4660-afd9-f8dc062ab48b
+		summarizeBy: none
+		sourceColumn: Designation
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 1d54c9c1-4d95-41cf-89be-e74334361a38
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Label
+		dataType: string
+		lineageTag: f089db94-0b9a-4478-9356-998c8b54b5f2
+		summarizeBy: none
+		sourceColumn: Label
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Practitioners = m
+		mode: import
+		source = ```
+				let
+				PractitionerType = type table [
+				    id = text,
+				    title = text,
+				    first_name = text,
+				    last_name = text,
+				    display_name=text,
+				    designation=text,
+				    description=text,
+				    label=text,
+				    created_at = datetimezone,
+				    updated_at = datetimezone
+				],
+				
+				    QueryFilters = {        
+				        "created_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("practitioners", "practitioners", PractitionerType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, PractitionerType),
+				
+				    RenamedTable = Table.RenameColumns(appliedSchema, {
+				        {"id", "Practitioner ID"},
+				        {"first_name", "First Name"}, 
+				        {"last_name", "Last Name"},
+				        {"title", "Title"},
+				        {"display_name", "Display name"},
+				        {"designation", "Designation"},
+				        {"description", "Description"},
+				        {"label", "Label"},
+				        {"created_at", "Created at"},
+				        {"updated_at","Updated at"} 
+				        }        
+				        )
+				
+				in
+				    RenamedTable
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

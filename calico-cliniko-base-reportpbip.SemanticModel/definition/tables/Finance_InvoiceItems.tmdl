@@ -1,0 +1,159 @@
+table Finance_InvoiceItems
+	lineageTag: 8c3148ed-47e3-4d8c-a7da-4f34825b3fa0
+
+	column 'Invoice Item ID'
+		lineageTag: 7754c306-1eb1-4add-ab7b-a08fe3939ad4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Invoice Item ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Amount'
+		lineageTag: 7153080c-3450-4e32-9932-0d7e5835e7f5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Tax Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Discounted Amount'
+		lineageTag: 7d06b030-99ff-4f31-b191-e6dfe0a74859
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Discounted Amount]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Concession Type Name'
+		lineageTag: fdfb9d96-82d7-4752-b3fe-f97042d7ad36
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Concession Type Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Discount Percentage'
+		lineageTag: d52386aa-5025-4de0-8b9d-6168227a10b1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Discount Percentage]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Is Monetary Discount'
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ac95af3a-e2ef-4e9a-8be8-48bc1c5f1ffe
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Is Monetary Discount]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		lineageTag: afe34dad-39fe-4c9e-a5db-640f79efa6d2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Net Price'
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 48a55f49-0278-4867-88ac-a0984a5ff879
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Net Price]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		lineageTag: c5ed1628-b8dc-44a6-b394-9b0efebce511
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Quantity]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tax Name'
+		lineageTag: 6686824a-ead6-43c2-8e9f-84a05f3d3f83
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Tax Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Rate'
+		lineageTag: 513b344c-109b-41e9-9b19-8e5bc8b35445
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Tax Rate]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Price'
+		lineageTag: 989752ce-cbf4-4452-b68e-268c621cf302
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Unit Price]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Including Tax'
+		lineageTag: c52edcf9-8390-4f96-82da-9921acd81dad
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: InvoiceItems[Total Including Tax]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Code
+		lineageTag: 7f0e37a6-b9c8-4ec5-b827-38d8f7a2d430
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[Code]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'billable_item.links.self'
+		lineageTag: ae8ff17e-889c-4c06-a63c-0f7fc4f1671c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[billable_item.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'product.links.self'
+		lineageTag: 8a3bae0b-0ab5-45dc-ad8d-51502a5b837d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[product.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'invoice.links.self'
+		lineageTag: ecde8620-06f6-4efc-8a2e-dc3593d4919f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: InvoiceItems[invoice.links.self]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Finance_InvoiceItems = calculated
+		mode: import
+		source = InvoiceItems
+
+	annotation PBI_Id = 781f235938864595bc544e20c6f337c3
+

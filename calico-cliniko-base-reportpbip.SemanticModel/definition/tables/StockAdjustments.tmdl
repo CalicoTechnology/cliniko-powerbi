@@ -1,0 +1,160 @@
+/// Contains stock adjustment records from Cliniko including inventory changes,
+/// adjustment types, and quantities for product stock level management
+table StockAdjustments
+	lineageTag: 9bce751c-9ce7-40de-9e26-df989d0d0b48
+
+	/// Unique identifier for each stock adjustment record
+	/// Text data type containing stock adjustment ID from Cliniko system
+	column 'Stock Adjustment ID'
+		dataType: string
+		lineageTag: a849ff8f-a889-4764-8e0f-905b18deddc9
+		summarizeBy: none
+		sourceColumn: Stock Adjustment ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Type of stock adjustment made
+	/// Text data type with enumerated values: "Correction", "Damaged",
+	/// "Item Sold", "Other", "Out of Date", "Returned", "Stock Purchase"
+	column 'Adjustment Type'
+		dataType: string
+		lineageTag: 52e34c9c-3c3b-4aa2-aa4c-41b81a500172
+		summarizeBy: none
+		sourceColumn: Adjustment Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Quantity of stock adjustment (positive or negative)
+	/// Numeric data type representing stock level change amount
+	column Quantity
+		dataType: double
+		lineageTag: 7579e52e-2e03-48de-b179-5b8484b9b802
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Date when the stock adjustment was created
+	/// DateTime data type representing adjustment creation date
+	column 'Created At'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b42e98ea-939e-4313-a572-c800a2b08c3b
+		summarizeBy: none
+		sourceColumn: Created At
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Date when the stock adjustment was last updated
+	/// DateTime data type representing last modification date
+	column 'Updated At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e54e6125-2c1c-4d94-bc62-4260a849e5e8
+		summarizeBy: none
+		sourceColumn: Updated At
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Reference link to product record in Cliniko system
+	/// Text data type containing product URL reference
+	column 'product.links.self'
+		dataType: string
+		lineageTag: 273a0d98-4424-42c9-8f17-931956c851fa
+		summarizeBy: none
+		sourceColumn: product.links.self
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Date portion of stock adjustment creation timestamp
+	/// Date data type calculated from Created At column for grouping
+	column StockDate = ```
+			
+			  DATE(
+			    YEAR( StockAdjustments[Created At] ),
+			    MONTH( StockAdjustments[Created At] ),
+			    DAY( StockAdjustments[Created At] )
+			  )
+			```
+		formatString: General Date
+		lineageTag: 0f70c2a8-f458-4b16-a4f7-cebd601c4b42
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Archived At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c240f3eb-eb17-45b5-b957-1f622edc7031
+		summarizeBy: none
+		sourceColumn: Archived At
+
+		variation Variation
+			isDefault
+			relationship: d301ba9c-b6d8-45f9-979e-868278323bfc
+			defaultHierarchy: LocalDateTable_7a508bd4-e2f2-4a9a-bf1c-74258afbdcf0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comment
+		dataType: string
+		lineageTag: 59e2635e-96e5-416f-8889-d6ca6ca81214
+		summarizeBy: none
+		sourceColumn: Comment
+
+		annotation SummarizationSetBy = Automatic
+
+	partition StockAdjustments = m
+		mode: import
+		source = ```
+				let
+				StockAdjustmentItemType = type table [
+				    id = text,
+				    product = record,
+				    archived_at = datetimezone,
+				    comment = text,
+				    adjustment_type = text,
+				    quantity = number,
+				    created_at = datetimezone,
+				    updated_at = datetimezone
+				],
+				 QueryFilters = {        
+				        "archived_at:*"       
+				    },
+				    Source = GetAllPagesByNextLink("stock_adjustments", "stock_adjustments", StockAdjustmentItemType,QueryFilters),
+				    appliedSchema = ChangeType2(Source, StockAdjustmentItemType),
+				
+				    appliedSchema2 = ExpandAndTransform(
+				        appliedSchema, 
+				        "product", 
+				        {"links", "self"}, 
+				        {"product.links", "product.links.self"}
+				    ),
+				
+				  RenamedProductItemType = Table.RenameColumns(
+				    appliedSchema2, 
+				    {
+				        {"id", "Stock Adjustment ID"},
+				        {"adjustment_type", "Adjustment Type"}, 
+				        {"quantity", "Quantity"},
+				        {"comment", "Comment"},
+				        {"archived_at", "Archived At"},
+				        {"created_at", "Created At"},
+				        {"updated_at", "Updated At"}
+				    }
+				)
+				
+				in
+				    RenamedProductItemType
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
