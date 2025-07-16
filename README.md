@@ -44,7 +44,7 @@ If your reports don't need these you can remove them to save load time.  You can
    ```
 
    **Option B: Download ZIP File**
-   - Go to the [GitHub repository](https://github.com/tunechr/cliniko-reports)
+   - Go to the [GitHub repository](https://github.com/CalicoTechnology/cliniko-powerbi)
    - Click the green "Code" button
    - Select "Download ZIP" from the dropdown menu
    - Extract the ZIP file to your desired location on your computer
@@ -117,9 +117,8 @@ This project is licensed under the GNU Affero General Public License v3.0 - see 
 
 ## 🆘 Support
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/tunechr/cliniko-reports/issues)
-- **Documentation**: Check the [Wiki](https://github.com/tunechr/cliniko-reports/wiki) for detailed guides
-- **Community**: Join discussions in the [Discussions](https://github.com/yourusername/cliniko-reports/discussions) section
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/CalicoTechnology/cliniko-powerbi/issues)
+- **Community**: Join discussions in the [Discussions](https://github.com/CalicoTechnology/cliniko-powerbi/discussions) section
 
 ## 🙏 Acknowledgments
 
