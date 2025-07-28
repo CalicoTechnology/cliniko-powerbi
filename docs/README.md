@@ -2,6 +2,9 @@
 
 Welcome to the documentation for Cliniko Reports for Power BI. This guide will help you get started with the reporting solution and make the most of its features.
 
+![Alt text](/docs//assets/images/screenshot-appointments.png "Appointments Report")
+![Alt text](/docs//assets/images/screenshot-practitioner.png "Practitioner Report")
+
 ## Table of Contents
 
 1. [Installation Guide](./installation.md)
