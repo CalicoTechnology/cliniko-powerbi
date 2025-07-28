@@ -3,14 +3,18 @@ We're really excited to release our Power BI reporting solution for Cliniko, pro
 
 You can either use these reports 'as is', create your own reports, and even contribute to this project.   We would love to see what reports and enchantments you create.
 
+
 ## 📊 Available Reports
 
 ### Core Reports
 We have added some base reports for you to use, or you can create your own from the data available. 
 
 - **Appointments Dashboard**: Total appointments, YTD tracking, YoY growth
+![Alt text](/docs//assets/images/screenshot-appointments.png "Appointments Report")
 - **Financial Overview**: Invoice tracking, revenue analysis, product performance
 - **Practitioner Performance**: Hours worked, appointment load, availability
+![Alt text](/docs//assets/images/screenshot-practitioner.png "Practitioner Report")
+
 - **Business Metrics**: Overall practice performance and KPIs
 
 ### Data Sources
